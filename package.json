@@ -1,0 +1,36 @@
+{
+  "name": "ahgora-unofficial-api",
+  "engines": {
+    "node": "9.9.0"
+  },
+  "version": "1.0.0",
+  "description": "Ahgora Unofficial API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev-start": "./node_modules/.bin/nodemon -L index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Gabriel Rimes",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.17.3",
+    "standard": "^10.0.3"
+  },
+  "dependencies": {
+    "atob": "^2.1.0",
+    "btoa": "^1.2.1",
+    "cheerio": "^1.0.0-rc.2",
+    "jsonminify": "^0.4.1",
+    "koa": "^2.5.0",
+    "koa-mount": "^3.0.0",
+    "koa-router": "^7.4.0",
+    "lodash": "^4.17.5",
+    "moment": "^2.22.0",
+    "moment-duration-format": "^2.2.2",
+    "request": "^2.85.0",
+    "request-promise-native": "^1.0.5",
+    "slugify": "^1.2.9"
+  }
+}
