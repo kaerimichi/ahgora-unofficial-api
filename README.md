@@ -18,7 +18,7 @@ Start the server with `npm start`. The default port is 8080, but you can customi
 
 ### Accessing the history
 
-Endpoint: `/history/{{account}}/{{period}}`
+`GET http://localhost:8080/history/{{account}}/{{period}}`
 
 You can access the history along with some information from the current week and day, regarding your work time. You just have to provide two parameters:
 
