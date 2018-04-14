@@ -12,17 +12,23 @@ $ npm install
 
 ## Usage
 
-### Starting the server
+```
+$ npm start
+```
 
-Start the server with `npm start`. The default port is 8080, but you can customize this with the `PORT` env variable. The default service URL can also be customized with the `SERVICE_URL` variable. Default values should work fine ;)
+### Registering a punch
+
+`POST /registration/register/:account`
 
 ### Accessing the history
 
-`GET http://localhost:8080/history/{{account}}/{{period}}`
+`GET /history/summary/:account/:period`
 
 You can access the history along with some information from the current week and day, regarding your work time. You just have to provide two parameters:
 
   - **account**: the code of your company which was registered in the Ahgora service;
   - **period**: the desired period of the report in `MM-YYYY` format.
 
-The request is authenticated with HTTP Basic Auth and you just have to use your Ahgora credentials.
+### Authentication
+
+The requests are authenticated with HTTP Basic Auth and you just have to use your Ahgora credentials.
