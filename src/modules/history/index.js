@@ -6,7 +6,7 @@ const pageHandler = require('./pageHandler')
 const scraper = require('./scraper')
 const contentHandler = require('./contentHandler')
 
-router.get('/:account/:period', async ctx => {
+router.get('/summary/:account/:period', async ctx => {
   try {
     const pageBody = await pageHandler.getBody(
       ctx.headers.authorization,
@@ -14,8 +14,14 @@ router.get('/:account/:period', async ctx => {
       ctx.params.period
     )
     const scrapedContent = scraper.getContents(pageBody)
+    const content = contentHandler.getContents(scrapedContent)
 
-    ctx.body = contentHandler.getContents(scrapedContent)
+    if (!content.userInfo.registry) {
+      ctx.status = 204
+      ctx.body = null
+    } else {
+      ctx.body = contentHandler.getContents(scrapedContent)
+    }
   } catch (e) {
     ctx.status = 500
     ctx.body = null
