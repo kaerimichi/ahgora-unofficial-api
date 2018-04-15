@@ -8,11 +8,17 @@ const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
 
 router.post('/register/:account', async ctx => {
   try {
+    const userAgent = ctx.headers['user-agent'] || ''
     const [ username, password ] = atob(ctx.headers.authorization.split(' ')[1]).split(':')
     const account = ctx.params.account
     const instance = await phantom.create()
     const page = await instance.createPage()
     let evalResult
+
+    page.property(
+      'customHeaders',
+      { 'User-Agent': userAgent }
+    )
 
     await page.open(`${baseUrl}/batidaonline/index/${account}/`)
     evalResult = await page.evaluate(function (params) {
