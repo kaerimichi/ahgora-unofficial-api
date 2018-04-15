@@ -6,11 +6,11 @@ const pageHandler = require('./pageHandler')
 const scraper = require('./scraper')
 const contentHandler = require('./contentHandler')
 
-router.get('/summary/:account/:period', async ctx => {
+router.get('/summary/:identity/:period', async ctx => {
   try {
     const pageBody = await pageHandler.getBody(
       ctx.headers.authorization,
-      ctx.params.account,
+      ctx.params.identity,
       ctx.params.period
     )
     const scrapedContent = scraper.getContents(pageBody)

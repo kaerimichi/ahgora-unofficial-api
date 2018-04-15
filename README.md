@@ -18,15 +18,15 @@ $ npm start
 
 ### Registering a punch
 
-`POST /registration/register/:account`
+`POST /registration/register/:identity`
 
 ### Accessing the history
 
-`GET /history/summary/:account/:period`
+`GET /history/summary/:identity/:period`
 
 You can access the history along with some information from the current week and day, regarding your work time. You just have to provide two parameters:
 
-  - **account**: the code of your company which was registered in the Ahgora service;
+  - **identity**: the code of your company which was registered in the Ahgora service;
   - **period**: the desired period of the report in `MM-YYYY` format.
 
 ### Authentication

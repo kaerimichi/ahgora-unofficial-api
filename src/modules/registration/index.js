@@ -6,11 +6,11 @@ const phantom = require('phantom')
 const atob = require('atob')
 const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
 
-router.post('/register/:account', async ctx => {
+router.post('/register/:identity', async ctx => {
   try {
     const userAgent = ctx.headers['user-agent'] || ''
     const [ username, password ] = atob(ctx.headers.authorization.split(' ')[1]).split(':')
-    const account = ctx.params.account
+    const identity = ctx.params.identity
     const instance = await phantom.create()
     const page = await instance.createPage()
     let evalResult
@@ -20,7 +20,7 @@ router.post('/register/:account', async ctx => {
       { 'User-Agent': userAgent }
     )
 
-    await page.open(`${baseUrl}/batidaonline/index/${account}/`)
+    await page.open(`${baseUrl}/batidaonline/index/${identity}/`)
     evalResult = await page.evaluate(function (params) {
       const output = { error: false, statusCode: 200, message: '' }
 
