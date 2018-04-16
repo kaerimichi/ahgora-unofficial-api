@@ -49,6 +49,7 @@ router.post('/register/:identity', async ctx => {
         default: {
           output.statusCode = 201
           output.message = 'Registration succeded.'
+          output.punches = serviceMessage.split(': ')[1].split(' ').filter(entry => entry.length > 0)
         }
       }
 
