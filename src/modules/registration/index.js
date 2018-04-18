@@ -21,14 +21,18 @@ router.post('/register/:identity', async ctx => {
     )
 
     await page.open(`${baseUrl}/batidaonline/index/${identity}/`)
+
     evalResult = await page.evaluate(function (params) {
-      const output = { error: false, statusCode: 200, message: '' }
+      // legacy JS from now on
+      var output = { error: false, statusCode: 200, message: '' }
 
       $('input[name=account]').val(String(params.username))
       $('input[name=password]').val(String(params.password))
       $('#botao_entrar').trigger('click')
 
-      const serviceMessage = $('.noty_text').text()
+      do { /* some crazy dance ┗(-_- )┓ */ } while (!$('#noty_top_layout_container').length)
+
+      var serviceMessage = $('.noty_text').text()
       output.originalMessage = serviceMessage
 
       switch (serviceMessage) {
@@ -49,7 +53,8 @@ router.post('/register/:identity', async ctx => {
         default: {
           output.statusCode = 201
           output.message = 'Registration succeded.'
-          output.punches = serviceMessage.split(': ')[1].split(' ').filter(entry => entry.length > 0)
+          output.punches = serviceMessage.split(': ')[1].split(' ')
+          output.punches = null
         }
       }
 
