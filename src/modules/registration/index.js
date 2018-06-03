@@ -23,7 +23,7 @@ router.post('/register/:identity', async ctx => {
     await page.open(`${baseUrl}/batidaonline/index/${identity}/`)
 
     evalResult = await page.evaluate(function (params) {
-      // legacy JS from now on
+      // this will be executed on the page
       var output = { error: false, statusCode: 200, message: '' }
 
       $('input[name=account]').val(String(params.username))
@@ -52,9 +52,8 @@ router.post('/register/:identity', async ctx => {
         }
         default: {
           output.statusCode = 201
-          output.message = 'Registration succeded.'
-          output.punches = serviceMessage.split(': ')[1].split(' ')
-          output.punches = null
+          output.message = 'Registration succeeded.'
+          output.punches = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1)
         }
       }
 
