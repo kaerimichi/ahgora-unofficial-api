@@ -1,4 +1,9 @@
 #!/bin/sh
 
-npm install
+apk update --no-cache
+apk add nodejs tzdata
+npm install --production
+cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+echo "America/Sao_Paulo" > /etc/timezone
+apk del tzdata
 npm start
