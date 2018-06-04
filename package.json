@@ -1,7 +1,7 @@
 {
   "name": "ahgora-unofficial-api",
   "engines": {
-    "node": "9.9.0"
+    "node": "8.11.2"
   },
   "version": "1.0.0",
   "description": "Ahgora Unofficial API",
