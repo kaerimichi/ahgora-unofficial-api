@@ -58,10 +58,17 @@ router.post('/register/:identity', async ctx => {
           break
         }
         default: {
+          var parsedPunches = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1)
+          var transformedPunches = []
+
+          for (var i = 0; i < parsedPunches.length; i++) {
+            transformedPunches.push(parsedPunches[i].replace(':', ''))
+          }
+
           output.statusCode = 201
           output.message = 'Registration succeeded.'
-          output.punches = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1).map(entry => entry.replace(':', ''))
-          output.batidas_dia = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1).map(entry => entry.replace(':', ''))
+          output.punches = parsedPunches
+          output.batidas_dia = transformedPunches
         }
       }
 
