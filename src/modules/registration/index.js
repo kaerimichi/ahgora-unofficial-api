@@ -24,7 +24,12 @@ router.post('/register/:identity', async ctx => {
 
     evalResult = await page.evaluate(function (params) {
       // this will be executed on the page
-      var output = { result: true, error: false, statusCode: 200, message: '' }
+      var output = {
+        result: true,
+        error: false,
+        statusCode: 200,
+        message: ''
+      }
 
       $('input[name=account]').val(String(params.username))
       $('input[name=password]').val(String(params.password))
@@ -56,7 +61,7 @@ router.post('/register/:identity', async ctx => {
           output.statusCode = 201
           output.message = 'Registration succeeded.'
           output.punches = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1)
-          output.batidas_dia = output.punches
+          output.batidas_dia = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1)
         }
       }
 
