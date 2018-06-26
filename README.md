@@ -1,6 +1,6 @@
 # Ahgora Unofficial API
 
-![](https://img.shields.io/badge/node-%3E=9-green.svg)
+![](https://img.shields.io/badge/node-%3E=8-green.svg)
 
 An unofficial API to retrieve useful details from [Ahgora](https://ahgora.com.br) through data scraping.
 
