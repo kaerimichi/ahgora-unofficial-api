@@ -1,7 +1,7 @@
 const Koa = require('koa')
 const Router = require('koa-router')
 const router = new Router()
-const balance = new Koa()
+const app = new Koa()
 const pageHandler = require('./pageHandler')
 const scraper = require('./scraper')
 const contentHandler = require('./contentHandler')
@@ -28,8 +28,8 @@ router.get('/summary/:identity/:period', async ctx => {
   }
 })
 
-balance
+app
   .use(router.routes())
   .use(router.allowedMethods())
 
-module.exports = balance
+module.exports = app
