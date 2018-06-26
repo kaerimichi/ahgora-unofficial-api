@@ -24,7 +24,7 @@ router.post('/register/:identity', async ctx => {
 
     evalResult = await page.evaluate(function (params) {
       // this will be executed on the page
-      var output = { error: false, statusCode: 200, message: '' }
+      var output = { result: true, error: false, statusCode: 200, message: '' }
 
       $('input[name=account]').val(String(params.username))
       $('input[name=password]').val(String(params.password))
@@ -37,6 +37,7 @@ router.post('/register/:identity', async ctx => {
 
       switch (serviceMessage) {
         case 'Este funcionário não possui permissão para utilizar este dispositivo.': {
+          output.result = false
           output.error = true
           output.statusCode = 401
           output.message = 'This user is not allowed.'
@@ -44,6 +45,7 @@ router.post('/register/:identity', async ctx => {
           break
         }
         case 'Usuário ou senha incorretos': {
+          output.result = false
           output.error = true
           output.statusCode = 401
           output.message = 'Wrong username or password.'
@@ -54,6 +56,7 @@ router.post('/register/:identity', async ctx => {
           output.statusCode = 201
           output.message = 'Registration succeeded.'
           output.punches = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1)
+          output.batidas_dia = output.punches
         }
       }
 
