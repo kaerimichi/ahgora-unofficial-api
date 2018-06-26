@@ -60,8 +60,8 @@ router.post('/register/:identity', async ctx => {
         default: {
           output.statusCode = 201
           output.message = 'Registration succeeded.'
-          output.punches = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1)
-          output.batidas_dia = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1)
+          output.punches = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1).map(entry => entry.replace(':', ''))
+          output.batidas_dia = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1).map(entry => entry.replace(':', ''))
         }
       }
 
