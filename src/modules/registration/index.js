@@ -1,7 +1,7 @@
 const Koa = require('koa')
 const Router = require('koa-router')
 const router = new Router()
-const registration = new Koa()
+const app = new Koa()
 const phantom = require('phantom')
 const atob = require('atob')
 const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
@@ -85,8 +85,8 @@ router.post('/register/:identity', async ctx => {
   }
 })
 
-registration
+app
   .use(router.routes())
   .use(router.allowedMethods())
 
-module.exports = registration
+module.exports = app
