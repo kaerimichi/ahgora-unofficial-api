@@ -18,7 +18,13 @@ $ npm start
 
 ### Registering a punch
 
+Registration only:
+
 `POST /registration/register/:identity`
+
+Registration and history checking (a comparison will be made on the returned punch array and the one recorded on history for that date):
+
+`POST /registration/register/:identity?verify=true`
 
 ### Accessing the history
 

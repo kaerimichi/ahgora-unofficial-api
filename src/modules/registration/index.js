@@ -5,6 +5,8 @@ const app = new Koa()
 const phantom = require('phantom')
 const atob = require('atob')
 const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
+const moment = require('moment')
+const { isEqual } = require('lodash')
 
 router.post('/register/:identity', async ctx => {
   try {
@@ -28,6 +30,7 @@ router.post('/register/:identity', async ctx => {
         result: true,
         error: false,
         statusCode: 200,
+        verified: false,
         message: ''
       }
 
@@ -74,6 +77,30 @@ router.post('/register/:identity', async ctx => {
 
       return output
     }, { username, password })
+
+    if (evalResult.result && ctx.query.verify === 'true') {
+      const pageHandler = require('../history/pageHandler')
+      const scraper = require('../history/scraper')
+      const contentHandler = require('../history/contentHandler')
+      const pageBody = await pageHandler.getBody(
+        ctx.headers.authorization,
+        ctx.params.identity,
+        moment().format('MM-YYYY')
+      )
+      const scrapedContent = scraper.getContents(pageBody)
+      const content = contentHandler.getContents(scrapedContent)
+
+      if (content && content.monthPunches) {
+        const { monthPunches } = content
+        const currentDaySummary = monthPunches.find(entry => {
+          return entry.date === moment().format('YYYY-MM-DD')
+        })
+
+        if (isEqual(evalResult.punches, currentDaySummary.punches)) {
+          evalResult.verified = true
+        }
+      }
+    }
 
     ctx.status = evalResult.statusCode
     ctx.body = evalResult
