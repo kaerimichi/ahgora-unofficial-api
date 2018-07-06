@@ -43,36 +43,24 @@ router.post('/register/:identity', async ctx => {
       var serviceMessage = $('.noty_text').text()
       output.originalMessage = serviceMessage
 
-      switch (serviceMessage) {
-        case 'Este funcionário não possui permissão para utilizar este dispositivo.': {
-          output.result = false
-          output.error = true
-          output.statusCode = 401
-          output.message = 'This user is not allowed.'
+      var parsedPunches = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1)
 
-          break
+      if (parsedPunches.length) {
+        var transformedPunches = []
+
+        for (var i = 0; i < parsedPunches.length; i++) {
+          transformedPunches.push(parsedPunches[i].replace(':', ''))
         }
-        case 'Usuário ou senha incorretos': {
-          output.result = false
-          output.error = true
-          output.statusCode = 401
-          output.message = 'Wrong username or password.'
 
-          break
-        }
-        default: {
-          var parsedPunches = serviceMessage.match(/[0-2][0-9]:[0-5][0-9]/gi).slice(0, -1)
-          var transformedPunches = []
-
-          for (var i = 0; i < parsedPunches.length; i++) {
-            transformedPunches.push(parsedPunches[i].replace(':', ''))
-          }
-
-          output.statusCode = 201
-          output.message = 'Registration succeeded.'
-          output.punches = parsedPunches
-          output.batidas_dia = transformedPunches
-        }
+        output.statusCode = 201
+        output.message = 'Registration succeeded.'
+        output.punches = parsedPunches
+        output.batidas_dia = transformedPunches
+      } else {
+        output.result = false
+        output.error = true
+        output.statusCode = 401
+        output.message = 'Registration failed.'
       }
 
       return output
