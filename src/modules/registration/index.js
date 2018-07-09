@@ -25,8 +25,8 @@ router.post('/register/:identity', async ctx => {
     await page.open(`${baseUrl}/batidaonline/index/${identity}/`)
 
     evalResult = await page.evaluate(function (params) {
-      // this will be executed on the page
       var output = {
+        statistics: null,
         result: true,
         error: false,
         statusCode: 200,
@@ -86,6 +86,7 @@ router.post('/register/:identity', async ctx => {
 
         if (isEqual(evalResult.punches, currentDaySummary.punches)) {
           evalResult.verified = true
+          evalResult.statistics = content.statistics
         }
       }
     }
