@@ -7,6 +7,7 @@ const atob = require('atob')
 const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
 const moment = require('moment')
 const { isEqual } = require('lodash')
+const bodyParser = require('koa-bodyparser')
 
 router.post('/register/:identity', async ctx => {
   try {
@@ -101,7 +102,39 @@ router.post('/register/:identity', async ctx => {
   }
 })
 
+router.post('/registerdirect', async ctx => {
+  try {
+    const { post } = require('axios')
+    const userAgent = ctx.headers['user-agent'] || ''
+    const options = {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'User-Agent': userAgent
+      }
+    }
+    const response = await post(
+      `${baseUrl}/batidaonline/verifyIdentification`,
+      ctx.request.body,
+      options
+    )
+
+    if (!response.data) {
+      throw new Error('Invalid response from server.')
+    }
+
+    ctx.status = response.status
+    ctx.body = response.data
+  } catch (e) {
+    ctx.status = 500
+    ctx.body = {
+      result: false,
+      message: e.message
+    }
+  }
+})
+
 app
+  .use(bodyParser())
   .use(router.routes())
   .use(router.allowedMethods())
 
