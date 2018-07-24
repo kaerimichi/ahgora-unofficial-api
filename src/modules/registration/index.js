@@ -8,6 +8,19 @@ const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
 const moment = require('moment')
 const { isEqual } = require('lodash')
 const bodyParser = require('koa-bodyparser')
+const getHistoryContent = async (username, password, identity) => {
+  const btoa = require('btoa')
+  const pageHandler = require('../history/pageHandler')
+  const scraper = require('../history/scraper')
+  const contentHandler = require('../history/contentHandler')
+  const hash = btoa(`${username}:${password}`)
+  const pageBody = await pageHandler.getBody(
+    `Basic ${hash}`, identity, moment().format('MM-YYYY')
+  )
+  const scrapedContent = scraper.getContents(pageBody)
+
+  return contentHandler.getContents(scrapedContent)
+}
 
 router.post('/register/:identity', async ctx => {
   try {
@@ -68,26 +81,17 @@ router.post('/register/:identity', async ctx => {
     }, { username, password })
 
     if (evalResult.result && ctx.query.verify === 'true') {
-      const pageHandler = require('../history/pageHandler')
-      const scraper = require('../history/scraper')
-      const contentHandler = require('../history/contentHandler')
-      const pageBody = await pageHandler.getBody(
-        ctx.headers.authorization,
-        ctx.params.identity,
-        moment().format('MM-YYYY')
-      )
-      const scrapedContent = scraper.getContents(pageBody)
-      const content = contentHandler.getContents(scrapedContent)
+      const historyContent = getHistoryContent(username, password, ctx.params.identity)
 
-      if (content && content.monthPunches) {
-        const { monthPunches } = content
+      if (historyContent && historyContent.monthPunches) {
+        const { monthPunches } = historyContent
         const currentDaySummary = monthPunches.find(entry => {
           return entry.date === moment().format('YYYY-MM-DD')
         })
 
         if (isEqual(evalResult.punches, currentDaySummary.punches)) {
           evalResult.verified = true
-          evalResult.statistics = content.statistics
+          evalResult.statistics = historyContent.statistics
         }
       }
     }
@@ -120,6 +124,18 @@ router.post('/registerdirect', async ctx => {
 
     if (!response.data) {
       throw new Error('Invalid response from server.')
+    }
+
+    if (ctx.query.altId) {
+      const { statistics } = await getHistoryContent(
+        ctx.request.body.account,
+        ctx.request.body.password,
+        ctx.query.altId
+      )
+
+      response.data.statistics = response.data.result
+        ? statistics
+        : null
     }
 
     ctx.status = response.status
