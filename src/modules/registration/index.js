@@ -136,6 +136,10 @@ router.post('/registerdirect/:identity', async ctx => {
       ? statistics
       : null
 
+    response.data.punches = response.data.batidas_dia.length
+      ? response.data.batidas_dia.map(punch => punch.match(/.{1,2}/g).join(':'))
+      : null
+
     ctx.status = response.status
     ctx.body = response.data
   } catch (e) {
