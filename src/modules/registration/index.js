@@ -106,7 +106,7 @@ router.post('/register/:identity', async ctx => {
   }
 })
 
-router.post('/registerdirect', async ctx => {
+router.post('/registerdirect/:identity', async ctx => {
   try {
     const { post } = require('axios')
     const userAgent = ctx.headers['user-agent'] || ''
@@ -126,17 +126,15 @@ router.post('/registerdirect', async ctx => {
       throw new Error('Invalid response from server.')
     }
 
-    if (ctx.query.altId) {
-      const { statistics } = await getHistoryContent(
-        ctx.request.body.account,
-        ctx.request.body.password,
-        ctx.query.altId
-      )
+    const { statistics } = await getHistoryContent(
+      ctx.request.body.account,
+      ctx.request.body.password,
+      ctx.params.identity
+    )
 
-      response.data.statistics = response.data.result
-        ? statistics
-        : null
-    }
+    response.data.statistics = response.data.result
+      ? statistics
+      : null
 
     ctx.status = response.status
     ctx.body = response.data
