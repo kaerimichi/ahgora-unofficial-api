@@ -1,5 +1,6 @@
 const { getStringTime, getWeekMinutes, getDayBalance } = require('../../utils/balance')
 const moment = require('moment')
+const { last } = require('lodash')
 require('moment-duration-format')
 
 const getWeekDays = () => {
@@ -17,14 +18,19 @@ const getWeekDays = () => {
     .filter(date => ['0', '6'].indexOf(moment(date).format('e')) < 0)
     .map(date => moment(date).format('YYYY-MM-DD'))
 }
-const getWeekPunches = (monthPunches, includeEmptyPunches = false) => {
+const getWeekPunches = (monthPunches, emptyPunches = false, onlyWorkDays = false) => {
   const weekDays = getWeekDays()
 
   return monthPunches
     .filter(entry => {
-      if (includeEmptyPunches) {
+      if (onlyWorkDays) {
+        return weekDays.indexOf(entry.date) > -1 && !entry.holiday
+      }
+
+      if (emptyPunches) {
         return weekDays.indexOf(entry.date) > -1
       }
+
       return weekDays.indexOf(entry.date) > -1 && entry.punches
     })
 }
@@ -38,11 +44,19 @@ const getWeekTotalMinutes = weekPunches => {
 }
 
 function getContents (scrapedContent) {
+  const rawWeekPunches = getWeekPunches(scrapedContent.monthPunches, true, true)
   let totalWeekMinutes
   let weekMinutes
   let weekPunches
   let dayPunches
   let dayMinutes
+  let lastWorkDayOfWeek = rawWeekPunches && rawWeekPunches.length
+    ? last(rawWeekPunches).date
+    : false
+  let isLastWorkDay = lastWorkDayOfWeek
+    ? lastWorkDayOfWeek === moment().format('YYYY-MM-DD')
+    : false
+  let remainingOfTodayAsMinutes
 
   dayPunches = getWeekPunches(scrapedContent.monthPunches)
     .filter(({ date }) => date === moment().format('YYYY-MM-DD'))
@@ -51,6 +65,9 @@ function getContents (scrapedContent) {
   totalWeekMinutes = getWeekTotalMinutes(getWeekPunches(scrapedContent.monthPunches, true))
   weekMinutes = getWeekMinutes(weekPunches)
   dayMinutes = getDayBalance(dayPunches)
+  remainingOfTodayAsMinutes = !isLastWorkDay
+    ? 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
+    : totalWeekMinutes - weekMinutes
 
   scrapedContent.statistics = {
     dayBalance: {
@@ -59,8 +76,8 @@ function getContents (scrapedContent) {
         asShortTime: getStringTime(dayMinutes)
       },
       remaining: {
-        asMinutes: 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes,
-        asShortTime: getStringTime(480 - dayMinutes)
+        asMinutes: remainingOfTodayAsMinutes,
+        asShortTime: getStringTime(remainingOfTodayAsMinutes)
       },
       extra: {
         asMinutes: dayMinutes > 480 ? dayMinutes - 480 : null,
