@@ -1,4 +1,4 @@
-const moment = require('moment')
+const moment = require('moment-timezone')
 const slugify = require('slugify')
 const cheerio = require('cheerio')
 const { trim, lowerCase, camelCase, has } = require('lodash')

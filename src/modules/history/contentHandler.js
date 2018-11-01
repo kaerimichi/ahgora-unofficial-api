@@ -1,5 +1,5 @@
 const { getStringTime, getWeekMinutes, getDayBalance } = require('../../utils/balance')
-const moment = require('moment')
+const moment = require('moment-timezone')
 const { last } = require('lodash')
 require('moment-duration-format')
 

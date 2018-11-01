@@ -5,7 +5,7 @@ const app = new Koa()
 const phantom = require('phantom')
 const atob = require('atob')
 const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
-const moment = require('moment')
+const moment = require('moment-timezone')
 const { isEqual } = require('lodash')
 const bodyParser = require('koa-bodyparser')
 const getHistoryContent = async (username, password, identity) => {
