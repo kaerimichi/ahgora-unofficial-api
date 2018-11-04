@@ -70,6 +70,7 @@ function getContents (scrapedContent) {
     : totalWeekMinutes - weekMinutes
 
   scrapedContent.statistics = {
+    serverTime: moment().format('HH:mm:ss'),
     dayBalance: {
       completed: {
         asMinutes: dayMinutes,
