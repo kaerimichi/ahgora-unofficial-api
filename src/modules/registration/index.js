@@ -111,6 +111,7 @@ router.post('/registerdirect/:identity', async ctx => {
     const { post } = require('axios')
     const userAgent = ctx.headers['user-agent'] || ''
     const options = {
+      timeout: process.env.DIRECT_TIMEOUT || 30000,
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': userAgent
