@@ -127,19 +127,15 @@ router.post('/registerdirect/:identity', async ctx => {
       throw new Error('Invalid response from server.')
     }
 
-    const { statistics } = await getHistoryContent(
+    const { statistics, monthPunches } = await getHistoryContent(
       ctx.request.body.account,
       ctx.request.body.password,
       ctx.params.identity
     )
+    const todayPunches = monthPunches.find(({ date }) => date === moment().format('YYYY-MM-DD'))
 
-    response.data.statistics = response.data.result
-      ? statistics
-      : null
-
-    response.data.punches = response.data.batidas_dia.length
-      ? response.data.batidas_dia.map(punch => punch.match(/.{1,2}/g).join(':'))
-      : null
+    response.data.statistics = response.data.result ? statistics : null
+    response.data.punches = todayPunches.punches || []
 
     ctx.status = response.status
     ctx.body = response.data
