@@ -2,8 +2,6 @@
 
 ![](https://img.shields.io/badge/node-%3E=8-green.svg)
 
-An unofficial API to retrieve useful details from [Ahgora](https://ahgora.com.br) through data scraping.
-
 ## Installation
 
 ```
@@ -18,13 +16,29 @@ $ npm start
 
 ### Registering a punch
 
-Registration only:
+#### Registration only (using PhantomJS to simulate user interaction):
 
 `POST /registration/register/:identity`
 
-Registration and history checking (a comparison will be made on the returned punch array and the one recorded on history for that date):
+#### Registration and history checking (a comparison will be made on the returned punch array and the one recorded on history for that date):
 
 `POST /registration/register/:identity?verify=true`
+
+#### Direct registration:
+
+`POST /registration/registerdirect/:identity`
+
+Request body (application/json):
+
+```
+{
+  "account": 0000,
+  "password": "your_password",
+  "identity": "your_company_id",
+  "origin": "pw2",
+  "key": ""
+}
+```
 
 ### Accessing the history
 
