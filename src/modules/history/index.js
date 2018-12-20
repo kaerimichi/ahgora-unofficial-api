@@ -2,25 +2,22 @@ const Koa = require('koa')
 const Router = require('koa-router')
 const router = new Router()
 const app = new Koa()
-const pageHandler = require('./pageHandler')
-const scraper = require('./scraper')
-const contentHandler = require('./contentHandler')
+const AhgoraHistoryScraper = require('../../lib/services/AhgoraHistoryScraper')
 
 router.get('/summary/:identity/:period', async ctx => {
   try {
-    const pageBody = await pageHandler.getBody(
+    const ahgoraHistoryScraper = new AhgoraHistoryScraper(
+      process.env.SERVICE_URL || 'https://www.ahgora.com.br',
       ctx.headers.authorization,
-      ctx.params.identity,
-      ctx.params.period
+      ctx.params.identity
     )
-    const scrapedContent = scraper.getContents(pageBody)
-    const content = contentHandler.getContents(scrapedContent)
+    const contents = await ahgoraHistoryScraper.getContents()
 
-    if (!content.userInfo.registry) {
+    if (!contents.userInfo.registry) {
       ctx.status = 204
       ctx.body = null
     } else {
-      ctx.body = contentHandler.getContents(scrapedContent)
+      ctx.body = contents
     }
   } catch (e) {
     ctx.status = 500
