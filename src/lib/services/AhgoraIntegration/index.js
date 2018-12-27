@@ -6,6 +6,7 @@ const { scrape } = require('./helpers/PageScraper')
 const { compute } = require('./helpers/TimeComputation')
 const DEFAULT_SERVICE_HOST = 'www.ahgora.com.br'
 const DUPLICATE_TOLERANCE = 5
+const DEFAULT_REQUEST_TIMEOUT = 6000
 
 module.exports = class AhgoraIntegration {
   constructor (url, basicAuthHash, companyId) {
@@ -22,14 +23,18 @@ module.exports = class AhgoraIntegration {
       const loginUrl = `${baseUrl}/externo/login`
       const form = { empresa: this.companyId, matricula: username, senha: password }
 
-      return request({ url: loginUrl, method: 'POST', form, resolveWithFullResponse: true }).then(loginResponse => {
+      return request({ url: loginUrl, method: 'POST', form, resolveWithFullResponse: true, timeout: DEFAULT_REQUEST_TIMEOUT }).then(loginResponse => {
         const authCookie = loginResponse.headers['set-cookie'][0]
         const cookie = request.cookie(authCookie)
         const cookieJar = request.jar()
 
         cookieJar.setCookie(cookie, baseUrl)
 
-        return request({ url: punchesUrl, jar: cookieJar }).then(scrape).then(compute)
+        return request({
+          url: punchesUrl,
+          jar: cookieJar,
+          timeout: DEFAULT_REQUEST_TIMEOUT
+        }).then(scrape).then(compute)
       })
     } catch (e) {
       throw e
@@ -54,7 +59,7 @@ module.exports = class AhgoraIntegration {
     return post(
       `${this.url}/batidaonline/verifyIdentification`,
       body,
-      { timeout: 10000, headers }
+      { timeout: DEFAULT_REQUEST_TIMEOUT, headers }
     ).then(response => response.data)
   }
 
