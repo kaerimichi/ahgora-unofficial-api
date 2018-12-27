@@ -8,6 +8,7 @@ const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
 const moment = require('moment-timezone')
 const { isEqual } = require('lodash')
 const bodyParser = require('koa-bodyparser')
+const AhgoraIntegration = require('../../lib/services/AhgoraIntegration')
 const getHistoryContent = async (username, password, identity) => {
   const btoa = require('btoa')
   const pageHandler = require('../history/pageHandler')
@@ -108,37 +109,28 @@ router.post('/register/:identity', async ctx => {
 
 router.post('/registerdirect/:identity', async ctx => {
   try {
-    const { post } = require('axios')
-    const userAgent = ctx.headers['user-agent'] || ''
-    const options = {
-      timeout: process.env.DIRECT_TIMEOUT || 30000,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'User-Agent': userAgent
-      }
-    }
-    const response = await post(
-      `${baseUrl}/batidaonline/verifyIdentification`,
-      ctx.request.body,
-      options
-    )
-
-    if (!response.data) {
-      throw new Error('Invalid response from server.')
-    }
-
-    const { statistics, monthPunches } = await getHistoryContent(
-      ctx.request.body.account,
-      ctx.request.body.password,
+    const currentDate = moment().format('YYYY-MM-DD')
+    const ahgoraIntegration = new AhgoraIntegration(
+      process.env.SERVICE_URL,
+      ctx.headers.authorization,
       ctx.params.identity
     )
-    const todayPunches = monthPunches.find(({ date }) => date === moment().format('YYYY-MM-DD'))
+    const historyContent = await ahgoraIntegration.getHistory()
+    const registrationData = await ahgoraIntegration.register(ctx.headers, ctx.request.body)
+    const { statistics, monthPunches } = ahgoraIntegration.recalculate(
+      historyContent,
+      [
+        {
+          date: currentDate,
+          punches: ahgoraIntegration.parsePunches(registrationData['batidas_dia'])
+        }
+      ]
+    )
 
-    response.data.statistics = response.data.result ? statistics : null
-    response.data.punches = todayPunches.punches || []
-
-    ctx.status = response.status
-    ctx.body = response.data
+    ctx.body = {
+      punches: monthPunches.find(({ date }) => date === currentDate).punches || [],
+      statistics
+    }
   } catch (e) {
     ctx.status = 500
     ctx.body = {

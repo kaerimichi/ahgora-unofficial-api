@@ -1,12 +1,15 @@
 const moment = require('moment')
 const atob = require('atob')
+const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
 const request = require('request-promise-native')
+const { post } = require('axios')
 const { scrape } = require('./helpers/PageScraper')
 const { compute } = require('./helpers/TimeComputation')
+const DUPLICATE_TOLERANCE = 5
 
 module.exports = class AhgoraIntegration {
   constructor (url, basicAuthHash, companyId) {
-    this.url = url
+    this.url = url || 'https://www.ahgora.com.br'
     this.basicAuthHash = basicAuthHash
     this.companyId = companyId
   }
@@ -43,5 +46,24 @@ module.exports = class AhgoraIntegration {
     })
 
     return compute(historyPayload)
+  }
+
+  register (headers, body) {
+    const options = { timeout: 10000, headers }
+
+    return post(`${baseUrl}/batidaonline/verifyIdentification`, body, options)
+      .then(response => response.data)
+  }
+
+  parsePunches (punches = []) {
+    return punches.reduce((acc, punch) => {
+      const date = moment().format('YYYY-MM-DD')
+      const currentPunch = moment(`${date} ${punch.match(/.{1,2}/g).join(':')}:00`)
+      const lastStoredPunch = moment(`${date} ${acc[acc.length - 1].match(/.{1,2}/g).join(':')}:00`)
+      const punchIsValid = currentPunch.diff(lastStoredPunch, 'minutes') >= DUPLICATE_TOLERANCE
+
+      if (punchIsValid) acc.push(currentPunch.format('HH:mm'))
+      return acc
+    }, [punches[0]])
   }
 }

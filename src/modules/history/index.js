@@ -7,7 +7,7 @@ const AhgoraIntegration = require('../../lib/services/AhgoraIntegration')
 router.get('/summary/:identity/:period', async ctx => {
   try {
     const ahgoraIntegration = new AhgoraIntegration(
-      process.env.SERVICE_URL || 'https://www.ahgora.com.br',
+      process.env.SERVICE_URL,
       ctx.headers.authorization,
       ctx.params.identity
     )
