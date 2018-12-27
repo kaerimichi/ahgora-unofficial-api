@@ -3,7 +3,7 @@
   "engines": {
     "node": "8.11.3"
   },
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "Ahgora Unofficial API",
   "main": "index.js",
   "scripts": {
