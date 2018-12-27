@@ -2,16 +2,16 @@ const Koa = require('koa')
 const Router = require('koa-router')
 const router = new Router()
 const app = new Koa()
-const AhgoraHistoryScraper = require('../../lib/services/AhgoraHistoryScraper')
+const AhgoraIntegration = require('../../lib/services/AhgoraIntegration')
 
 router.get('/summary/:identity/:period', async ctx => {
   try {
-    const ahgoraHistoryScraper = new AhgoraHistoryScraper(
+    const ahgoraIntegration = new AhgoraIntegration(
       process.env.SERVICE_URL || 'https://www.ahgora.com.br',
       ctx.headers.authorization,
       ctx.params.identity
     )
-    const contents = await ahgoraHistoryScraper.getContents()
+    const contents = await ahgoraIntegration.getHistory()
 
     if (!contents.userInfo.registry) {
       ctx.status = 204
