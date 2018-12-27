@@ -1,6 +1,5 @@
 const moment = require('moment')
 const atob = require('atob')
-const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
 const request = require('request-promise-native')
 const { post } = require('axios')
 const { scrape } = require('./helpers/PageScraper')
@@ -51,7 +50,7 @@ module.exports = class AhgoraIntegration {
   register (headers, body) {
     const options = { timeout: 10000, headers }
 
-    return post(`${baseUrl}/batidaonline/verifyIdentification`, body, options)
+    return post(`${this.url}/batidaonline/verifyIdentification`, body, options)
       .then(response => response.data)
   }
 
