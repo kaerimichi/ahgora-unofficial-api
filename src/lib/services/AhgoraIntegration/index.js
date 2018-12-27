@@ -42,6 +42,6 @@ module.exports = class AhgoraIntegration {
       }
     })
 
-    return historyPayload
+    return compute(historyPayload)
   }
 }
