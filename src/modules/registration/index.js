@@ -117,6 +117,11 @@ router.post('/registerdirect/:identity', async ctx => {
     )
     const historyContent = await ahgoraIntegration.getHistory()
     const registrationData = await ahgoraIntegration.register(ctx.headers, ctx.request.body)
+
+    if (!registrationData.result) {
+      throw new Error(`Error! Ahgora message: ${registrationData.reason}`)
+    }
+
     const { statistics, monthPunches } = ahgoraIntegration.recalculate(
       historyContent,
       [
