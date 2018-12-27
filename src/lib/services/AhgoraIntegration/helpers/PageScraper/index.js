@@ -2,6 +2,7 @@ const moment = require('moment-timezone')
 const slugify = require('slugify')
 const cheerio = require('cheerio')
 const { trim, lowerCase, camelCase, has } = require('lodash')
+const { getWorkTime, getStringTime } = require('../TimeComputation')
 
 function isHoliday (rawCalculated, overallInfo) {
   let parsedDayInfo = trim(rawCalculated).split(':')[0] ? camelCase(trim(rawCalculated).split(':')[0]) : null
@@ -77,18 +78,26 @@ function getMonthPunches ($, overallInfo) {
     let parsedDate = trim(rawDate).split('/').reverse().join('-')
     let rawPunches = $table.find('tbody tr').eq(i).find('td').eq(2).html()
     let rawCalculated = $table.find('tbody tr').eq(i).find('td').eq(6).html()
+    let parsedPunches
     let weekDay
 
     if (parsedDate.split('-').length === 1) continue
 
-    weekDay = parseInt(moment(`${parsedDate} 00:00:00`).format('e'))
+    weekDay = parseInt(moment(parsedDate, 'MM-DD').format('e'))
+    parsedPunches = trim(rawPunches).length > 0
+      ? trim(rawPunches).split(',').map(trim)
+      : null
 
     let item = {
-      date: parsedDate,
+      date: parsedDate.length > 5
+        ? parsedDate
+        : moment(parsedDate, 'MM-DD').format('YYYY-MM-DD'),
       weekDay,
       weekDayAsText: getWeekDay(weekDay),
-      punches: trim(rawPunches).length > 0 ? trim(rawPunches).split(',').map(trim) : null,
-      timeWorked: trim(rawCalculated).substring(0, 5) === 'Horas' ? trim(rawCalculated).split(' ')[2].substring(0, 5) : null,
+      punches: parsedPunches,
+      timeWorked: parsedPunches
+        ? getStringTime(getWorkTime(parsedPunches))
+        : null,
       holiday: isHoliday(rawCalculated, overallInfo),
       obs: $table.find('tbody tr').eq(i).hasClass('warning')
     }

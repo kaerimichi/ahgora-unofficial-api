@@ -152,4 +152,4 @@ function compute (scrapedContent) {
   return scrapedContent
 }
 
-module.exports = { compute }
+module.exports = { compute, getWorkTime, getStringTime }
