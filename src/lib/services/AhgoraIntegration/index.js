@@ -4,6 +4,7 @@ const request = require('request-promise-native')
 const { post } = require('axios')
 const { scrape } = require('./helpers/PageScraper')
 const { compute } = require('./helpers/TimeComputation')
+const DEFAULT_SERVICE_HOST = 'www.ahgora.com.br'
 const DUPLICATE_TOLERANCE = 5
 
 module.exports = class AhgoraIntegration {
@@ -48,10 +49,13 @@ module.exports = class AhgoraIntegration {
   }
 
   register (headers, body) {
-    const options = { timeout: 10000, headers }
+    headers['Host'] = DEFAULT_SERVICE_HOST
 
-    return post(`${this.url}/batidaonline/verifyIdentification`, body, options)
-      .then(response => response.data)
+    return post(
+      `${this.url}/batidaonline/verifyIdentification`,
+      body,
+      { timeout: 10000, headers }
+    ).then(response => response.data)
   }
 
   parsePunches (punches = []) {
