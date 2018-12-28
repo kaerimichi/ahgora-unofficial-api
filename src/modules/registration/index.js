@@ -118,7 +118,7 @@ router.post('/registerdirect/:identity', async ctx => {
     const historyContent = await ahgoraIntegration.getHistory()
 
     if (!historyContent.userInfo.registry) {
-      throw new Error('Cannot retrieve punches to validate')
+      throw new Error('Não foi possível validar a batida.')
     }
 
     const registrationData = await ahgoraIntegration.register(
@@ -127,7 +127,7 @@ router.post('/registerdirect/:identity', async ctx => {
     )
 
     if (!registrationData.result) {
-      throw new Error(`Registration error: ${registrationData.reason}`)
+      throw new Error(`Erro no registro: ${registrationData.reason}`)
     }
 
     const { statistics, monthPunches } = ahgoraIntegration.recalculate(
