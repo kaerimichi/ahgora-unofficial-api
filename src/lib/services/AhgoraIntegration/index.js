@@ -63,15 +63,10 @@ module.exports = class AhgoraIntegration {
     ).then(response => response.data)
   }
 
-  parsePunches (punches = []) {
-    return punches.reduce((acc, punch) => {
-      const date = moment().format('YYYY-MM-DD')
-      const currentPunch = moment(`${date} ${punch.match(/.{1,2}/g).join(':')}:00`)
-      const lastStoredPunch = moment(`${date} ${acc[acc.length - 1].match(/.{1,2}/g).join(':')}:00`)
-      const punchIsValid = currentPunch.diff(lastStoredPunch, 'minutes') >= DUPLICATE_TOLERANCE
+  punchIsValid (punches = [], newPunch = null) {
+    const lastPunch = moment(punches[punches.length - 1], 'HH:mm')
 
-      if (punchIsValid) acc.push(currentPunch.format('HH:mm'))
-      return acc
-    }, [punches[0]])
+    return moment(newPunch, 'HH:mm')
+      .diff(lastPunch, 'minutes') >= DUPLICATE_TOLERANCE
   }
 }

@@ -121,6 +121,14 @@ router.post('/registerdirect/:identity', async ctx => {
       throw new Error('Não foi possível validar a batida.')
     }
 
+    const currentPunch = moment().format('HH:mm')
+    const dayPunches = historyContent.monthPunches
+      .find(e => e.date === registrationData.day).punches
+
+    if (dayPunches && !ahgoraIntegration.punchIsValid(dayPunches, currentPunch)) {
+      throw new Error('Batida duplicada na tolerância.')
+    }
+
     const registrationData = await ahgoraIntegration.register(
       ctx.headers,
       ctx.request.body
@@ -130,14 +138,13 @@ router.post('/registerdirect/:identity', async ctx => {
       throw new Error(`Erro no registro: ${registrationData.reason}`)
     }
 
+    dayPunches.push(
+      moment(registrationData.time, 'HHmm').format('HH:mm')
+    )
+
     const { statistics, monthPunches } = ahgoraIntegration.recalculate(
       historyContent,
-      [
-        {
-          date: currentDate,
-          punches: ahgoraIntegration.parsePunches(registrationData['batidas_dia'])
-        }
-      ]
+      [{ date: currentDate, punches: dayPunches }]
     )
 
     ctx.body = {
