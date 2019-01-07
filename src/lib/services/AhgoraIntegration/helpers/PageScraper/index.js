@@ -85,7 +85,7 @@ function getMonthPunches ($, overallInfo) {
     rawPunches = $table.find('tbody tr').eq(i).find('td').eq(2).html()
     rawCalculated = $table.find('tbody tr').eq(i).find('td').eq(6).html()
 
-    weekDay = parseInt(moment(parsedDate, 'MM-DD').format('e'))
+    weekDay = parseInt(moment(parsedDate, 'YYYY-MM-DD').format('e'))
     parsedPunches = trim(rawPunches).length > 0
       ? trim(rawPunches).split(',').map(trim)
       : null
