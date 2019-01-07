@@ -74,14 +74,16 @@ function getMonthPunches ($, overallInfo) {
   let values = []
 
   for (let i = 0; i < punchLines; i++) {
-    let rawDate = $table.find('tbody tr').eq(i).find('td').eq(0).html()
-    let parsedDate = trim(rawDate).split('/').reverse().join('-')
-    let rawPunches = $table.find('tbody tr').eq(i).find('td').eq(2).html()
-    let rawCalculated = $table.find('tbody tr').eq(i).find('td').eq(6).html()
+    const parsedDate = $table.find('tbody tr').eq(i).find('span').data('datedb')
+    let rawCalculated
     let parsedPunches
+    let rawPunches
     let weekDay
 
-    if (parsedDate.split('-').length === 1) continue
+    if (!parsedDate || parsedDate.split('-').length === 1) continue
+
+    rawPunches = $table.find('tbody tr').eq(i).find('td').eq(2).html()
+    rawCalculated = $table.find('tbody tr').eq(i).find('td').eq(6).html()
 
     weekDay = parseInt(moment(parsedDate, 'MM-DD').format('e'))
     parsedPunches = trim(rawPunches).length > 0
@@ -89,9 +91,7 @@ function getMonthPunches ($, overallInfo) {
       : null
 
     let item = {
-      date: parsedDate.length > 5
-        ? parsedDate
-        : moment(parsedDate, 'MM-DD').format('YYYY-MM-DD'),
+      date: parsedDate,
       weekDay,
       weekDayAsText: getWeekDay(weekDay),
       punches: parsedPunches,
