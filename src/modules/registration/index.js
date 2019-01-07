@@ -123,7 +123,7 @@ router.post('/registerdirect/:identity', async ctx => {
 
     const currentPunch = moment().format('HH:mm')
     const dayPunches = historyContent.monthPunches
-      .find(e => e.date === registrationData.day).punches
+      .find(e => e.date === currentDate).punches
 
     if (dayPunches && !ahgoraIntegration.punchIsValid(dayPunches, currentPunch)) {
       throw new Error('Batida duplicada na tolerância.')
