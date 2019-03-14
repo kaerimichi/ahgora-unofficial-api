@@ -89,6 +89,7 @@ function getDayBalance (dayPunches = []) {
 
 function compute (scrapedContent) {
   const rawWeekPunches = getWeekPunches(scrapedContent.monthPunches, true, true)
+  const { overallInfo } = scrapedContent
   let totalWeekMinutes
   let weekMinutes
   let weekPunches
@@ -145,6 +146,20 @@ function compute (scrapedContent) {
       extra: {
         asMinutes: weekMinutes < 0 ? Math.abs(weekMinutes) : null,
         asShortTime: weekMinutes < 0 ? getStringTime(Math.abs(weekMinutes)) : null
+      }
+    },
+    monthBalance: {
+      positive: {
+        asMinutes: moment.duration(overallInfo.horasMensaisPositivas).asMinutes(),
+        asShortTime: overallInfo.horasMensaisPositivas
+      },
+      negative: {
+        asMinutes: moment.duration(overallInfo.horasMensaisNegativas).asMinutes(),
+        asShortTime: overallInfo.horasMensaisNegativas
+      },
+      completed: {
+        asMinutes: moment.duration(overallInfo.horasTrabalhadas).asMinutes(),
+        asShortTime: overallInfo.horasTrabalhadas
       }
     }
   }

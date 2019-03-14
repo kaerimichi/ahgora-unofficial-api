@@ -114,7 +114,7 @@ function scrape (body) {
   let overallInfo = getOverallInfo($)
   let monthPunches = getMonthPunches($, overallInfo)
 
-  return Promise.resolve({ userInfo, monthPunches })
+  return Promise.resolve({ userInfo, monthPunches, overallInfo })
 }
 
 module.exports = { scrape }
