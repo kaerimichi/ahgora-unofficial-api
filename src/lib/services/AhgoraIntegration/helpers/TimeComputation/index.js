@@ -161,10 +161,15 @@ function compute (scrapedContent) {
         asMinutes: moment.duration(overallInfo.horasTrabalhadas).asMinutes(),
         asShortTime: overallInfo.horasTrabalhadas
       },
-      extra: {
-        asMinutes: moment.duration(overallInfo.horaExtra65).asMinutes(),
-        asShortTime: overallInfo.horaExtra65
-      }
+      extra: overallInfo.horaExtra65
+        ? {
+          asMinutes: moment.duration(overallInfo.horaExtra65).asMinutes(),
+          asShortTime: overallInfo.horaExtra65
+        }
+        : {
+          asMinutes: moment.duration(overallInfo.falta).asMinutes(),
+          asShortTime: overallInfo.falta
+        }
     }
   }
 
