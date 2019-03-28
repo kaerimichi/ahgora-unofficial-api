@@ -3,7 +3,7 @@ const atob = require('atob')
 const request = require('request-promise-native')
 const { post } = require('axios')
 const { scrape } = require('./helpers/PageScraper')
-const { compute } = require('./helpers/TimeComputation')
+const { compute, getStringTime } = require('./helpers/TimeComputation')
 const DEFAULT_SERVICE_HOST = 'www.ahgora.com.br'
 const DUPLICATE_TOLERANCE = 5
 const DEFAULT_REQUEST_TIMEOUT = 6000
@@ -43,12 +43,29 @@ module.exports = class AhgoraIntegration {
 
   recalculate (historyPayload, dates = []) {
     const strDates = dates.map(({ date }) => date)
+    let todayPunches
+    let lastInterval
 
     historyPayload.monthPunches.forEach(entry => {
       if (strDates.indexOf(entry.date) === 0) {
         entry.punches = dates.find(e => e.date === entry.date).punches
+        todayPunches = entry.punches
       }
     })
+
+    if (todayPunches.length % 2 === 0) {
+      lastInterval = moment.duration(
+        moment(todayPunches[todayPunches.length - 1], 'HH:mm')
+          .diff(moment(todayPunches[todayPunches.length - 2], 'HH:mm'))
+          .asMinutes()
+      )
+      lastInterval = historyPayload.monthPunches.completed.asMinutes + lastInterval
+
+      historyPayload.monthPunches.completed = {
+        asMinutes: lastInterval,
+        asShortTime: getStringTime(lastInterval)
+      }
+    }
 
     return compute(historyPayload)
   }
