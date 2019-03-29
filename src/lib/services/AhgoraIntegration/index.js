@@ -59,8 +59,7 @@ module.exports = class AhgoraIntegration {
       lastInterval = moment.duration(
         moment(todayPunches[todayPunches.length - 1], 'HH:mm')
           .diff(moment(todayPunches[todayPunches.length - 2], 'HH:mm'))
-          .asMinutes()
-      )
+      ).asMinutes()
       lastInterval = historyPayload.monthPunches.completed.asMinutes + lastInterval
 
       historyPayload.monthPunches.completed = {
