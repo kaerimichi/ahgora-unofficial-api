@@ -149,14 +149,6 @@ function compute (scrapedContent) {
       }
     },
     monthBalance: {
-      positive: {
-        asMinutes: moment.duration(overallInfo.horasMensaisPositivas).asMinutes(),
-        asShortTime: overallInfo.horasMensaisPositivas
-      },
-      negative: {
-        asMinutes: moment.duration(overallInfo.horasMensaisNegativas).asMinutes(),
-        asShortTime: overallInfo.horasMensaisNegativas
-      },
       completed: {
         asMinutes: moment.duration(overallInfo.horasTrabalhadas).asMinutes(),
         asShortTime: overallInfo.horasTrabalhadas
