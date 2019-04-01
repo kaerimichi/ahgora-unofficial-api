@@ -153,15 +153,17 @@ function compute (scrapedContent) {
         asMinutes: moment.duration(overallInfo.horasTrabalhadas).asMinutes(),
         asShortTime: overallInfo.horasTrabalhadas
       },
-      extra: overallInfo.horaExtra65
-        ? {
-          asMinutes: moment.duration(overallInfo.horaExtra65).asMinutes(),
-          asShortTime: overallInfo.horaExtra65
-        }
-        : {
-          asMinutes: moment.duration(overallInfo.falta).asMinutes(),
-          asShortTime: overallInfo.falta
-        }
+      extra: overallInfo.horaExtra65 || overallInfo.falta
+        ? overallInfo.horaExtra65
+          ? {
+            asMinutes: moment.duration(overallInfo.horaExtra65).asMinutes(),
+            asShortTime: overallInfo.horaExtra65
+          }
+          : {
+            asMinutes: moment.duration(overallInfo.falta).asMinutes(),
+            asShortTime: overallInfo.falta
+          }
+        : { asMinutes: 0, asShortTime: '00:00' }
     }
   }
 
