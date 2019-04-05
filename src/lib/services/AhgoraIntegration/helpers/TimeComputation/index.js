@@ -88,19 +88,12 @@ function getDayBalance (dayPunches = []) {
 }
 
 function compute (scrapedContent) {
-  const rawWeekPunches = getWeekPunches(scrapedContent.monthPunches, true, true)
   const { overallInfo } = scrapedContent
   let totalWeekMinutes
   let weekMinutes
   let weekPunches
   let dayPunches
   let dayMinutes
-  let lastWorkDayOfWeek = rawWeekPunches && rawWeekPunches.length
-    ? last(rawWeekPunches).date
-    : false
-  let isLastWorkDay = lastWorkDayOfWeek
-    ? lastWorkDayOfWeek === moment().format('YYYY-MM-DD')
-    : false
   let remainingOfTodayAsMinutes
 
   dayPunches = getWeekPunches(scrapedContent.monthPunches)
@@ -110,9 +103,7 @@ function compute (scrapedContent) {
   totalWeekMinutes = getWeekTotalMinutes(getWeekPunches(scrapedContent.monthPunches, true))
   weekMinutes = getWeekMinutes(weekPunches)
   dayMinutes = getDayBalance(dayPunches)
-  remainingOfTodayAsMinutes = !isLastWorkDay
-    ? 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
-    : totalWeekMinutes - weekMinutes
+  remainingOfTodayAsMinutes = 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
 
   scrapedContent.statistics = {
     serverTime: moment().format('HH:mm:ss'),
