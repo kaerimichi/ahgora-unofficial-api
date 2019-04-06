@@ -148,13 +148,15 @@ function compute (scrapedContent) {
         ? overallInfo.horaExtra65
           ? {
             asMinutes: moment.duration(overallInfo.horaExtra65).asMinutes(),
-            asShortTime: overallInfo.horaExtra65
+            asShortTime: overallInfo.horaExtra65,
+            isPositive: true
           }
           : {
             asMinutes: moment.duration(overallInfo.falta).asMinutes(),
-            asShortTime: overallInfo.falta
+            asShortTime: overallInfo.falta.replace('-', ''),
+            isPositive: false
           }
-        : { asMinutes: 0, asShortTime: '00:00' }
+        : { asMinutes: 0, asShortTime: '00:00', isPositive: null }
     }
   }
 
