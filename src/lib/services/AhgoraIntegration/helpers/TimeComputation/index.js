@@ -71,10 +71,12 @@ function getWorkTime (punches = []) {
   return moment.duration({ minutes: workMinutes }).asMinutes()
 }
 
-function getStringTime (minutes = 0) {
-  return minutes > 0
-    ? moment.duration({ minutes }).format('HH:mm', { trim: false })
-    : '00:00'
+function getStringTime (minutes = 0, allowNegative = false) {
+  if (!allowNegative && minutes <= 0) {
+    return '00:00'
+  }
+
+  return moment.duration({ minutes }).format('HH:mm', { trim: false })
 }
 
 function getWeekMinutes (weekPunches = []) {
@@ -89,12 +91,19 @@ function getDayBalance (dayPunches = []) {
 
 function compute (scrapedContent) {
   const { overallInfo } = scrapedContent
+  const hourBankExists = overallInfo.horasMensaisPositivas && overallInfo.horasMensaisNegativas
+  const getDuration = stringTime => {
+    return Math.abs(
+      moment.duration(stringTime).asMinutes()
+    )
+  }
   let totalWeekMinutes
   let weekMinutes
   let weekPunches
   let dayPunches
   let dayMinutes
   let remainingOfTodayAsMinutes
+  let hourBank
 
   dayPunches = getWeekPunches(scrapedContent.monthPunches)
     .filter(({ date }) => date === moment().format('YYYY-MM-DD'))
@@ -104,6 +113,7 @@ function compute (scrapedContent) {
   weekMinutes = getWeekMinutes(weekPunches)
   dayMinutes = getDayBalance(dayPunches)
   remainingOfTodayAsMinutes = 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
+  hourBank = getDuration(overallInfo.horasMensaisPositivas) - getDuration(overallInfo.horasMensaisNegativas)
 
   scrapedContent.statistics = {
     serverTime: moment().format('HH:mm:ss'),
@@ -144,19 +154,17 @@ function compute (scrapedContent) {
         asMinutes: moment.duration(overallInfo.horasTrabalhadas).asMinutes(),
         asShortTime: overallInfo.horasTrabalhadas
       },
-      extra: overallInfo.horaExtra65 || overallInfo.falta
-        ? overallInfo.horaExtra65
-          ? {
-            asMinutes: moment.duration(overallInfo.horaExtra65).asMinutes(),
-            asShortTime: overallInfo.horaExtra65,
-            isPositive: true
-          }
-          : {
-            asMinutes: moment.duration(overallInfo.falta).asMinutes(),
-            asShortTime: overallInfo.falta.replace('-', ''),
-            isPositive: false
-          }
-        : { asMinutes: 0, asShortTime: '00:00', isPositive: null }
+      extra: hourBankExists
+        ? {
+          asMinutes: hourBank,
+          asShortTime: getStringTime(hourBank, true).replace('-', ''),
+          isPositive: hourBank > 0
+        }
+        : {
+          asMinutes: 0,
+          asShortTime: '00:00',
+          isPositive: null
+        }
     }
   }
 
