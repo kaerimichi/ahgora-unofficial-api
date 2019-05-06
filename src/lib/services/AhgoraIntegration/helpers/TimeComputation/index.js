@@ -91,7 +91,7 @@ function getDayBalance (dayPunches = []) {
 
 function compute (scrapedContent) {
   const { overallInfo } = scrapedContent
-  const hourBankExists = overallInfo.horasMensaisPositivas && overallInfo.horasMensaisNegativas
+  const hourBankExists = overallInfo.horasMensaisPositivas || overallInfo.horasMensaisNegativas
   const getDuration = stringTime => {
     return Math.abs(
       moment.duration(stringTime).asMinutes()
