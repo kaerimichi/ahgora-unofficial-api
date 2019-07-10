@@ -4,13 +4,14 @@ const router = new Router()
 const app = new Koa()
 const phantom = require('phantom')
 const atob = require('atob')
+const btoa = require('btoa')
 const baseUrl = process.env.SERVICE_URL || 'https://www.ahgora.com.br'
 const moment = require('moment-timezone')
 const { isEqual } = require('lodash')
 const bodyParser = require('koa-bodyparser')
+const slackAppToken = process.env.SLACK_APP_TOKEN
 const AhgoraIntegration = require('../../lib/services/AhgoraIntegration')
 const getHistoryContent = async (username, password, identity) => {
-  const btoa = require('btoa')
   const pageHandler = require('../history/pageHandler')
   const scraper = require('../history/scraper')
   const contentHandler = require('../history/contentHandler')
@@ -21,6 +22,19 @@ const getHistoryContent = async (username, password, identity) => {
   const scrapedContent = scraper.getContents(pageBody)
 
   return contentHandler.getContents(scrapedContent)
+}
+const getAuthorizationToken = ({ query, headers, request }) => {
+  if (query.slack !== undefined) {
+    if (request.body.token !== slackAppToken) {
+      throw new Error('Invalid Slack token')
+    }
+
+    const [ username, password ] = request.body.text.split(' ')
+
+    return 'Basic ' + btoa(`${username}:${password}`)
+  }
+
+  return headers.authorization
 }
 
 router.post('/register/:identity', async ctx => {
@@ -112,7 +126,7 @@ router.post('/registerdirect/:identity', async ctx => {
     const currentDate = moment().format('YYYY-MM-DD')
     const ahgoraIntegration = new AhgoraIntegration(
       process.env.SERVICE_URL,
-      ctx.headers.authorization,
+      getAuthorizationToken(ctx),
       ctx.params.identity
     )
     const historyContent = await ahgoraIntegration.getHistory()
@@ -143,7 +157,8 @@ router.post('/registerdirect/:identity', async ctx => {
 
     ctx.body = {
       punches: monthPunches.find(({ date }) => date === currentDate).punches || [],
-      statistics
+      statistics,
+      text: `Batida registrada (${currentPunch})!`
     }
   } catch (e) {
     ctx.status = 500
