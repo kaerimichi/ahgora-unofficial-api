@@ -11,7 +11,7 @@ router.get('/summary/:identity/:period', async ctx => {
       ctx.headers.authorization,
       ctx.params.identity
     )
-    const contents = await ahgoraIntegration.getHistory(ctx.params.period)
+    const contents = await ahgoraIntegration.getHistory(null, ctx.params.period)
 
     if (!contents.userInfo.registry) {
       ctx.status = 204

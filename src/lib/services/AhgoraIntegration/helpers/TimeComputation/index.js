@@ -89,8 +89,8 @@ function getDayBalance (dayPunches = []) {
   return getWeekMinutes([dayPunches])
 }
 
-function compute (scrapedContent) {
-  const { overallInfo } = scrapedContent
+function compute (content) {
+  const { overallInfo } = content
   const hourBankExists = overallInfo.horasMensaisPositivas || overallInfo.horasMensaisNegativas
   const getDuration = stringTime => {
     return Math.abs(
@@ -105,17 +105,17 @@ function compute (scrapedContent) {
   let remainingOfTodayAsMinutes
   let hourBank
 
-  dayPunches = getWeekPunches(scrapedContent.monthPunches)
+  dayPunches = getWeekPunches(content.monthPunches)
     .filter(({ date }) => date === moment().format('YYYY-MM-DD'))
     .map(({ punches }) => punches)[0]
-  weekPunches = getWeekPunches(scrapedContent.monthPunches).map(({ punches }) => punches)
-  totalWeekMinutes = getWeekTotalMinutes(getWeekPunches(scrapedContent.monthPunches, true))
+  weekPunches = getWeekPunches(content.monthPunches).map(({ punches }) => punches)
+  totalWeekMinutes = getWeekTotalMinutes(getWeekPunches(content.monthPunches, true))
   weekMinutes = getWeekMinutes(weekPunches)
   dayMinutes = getDayBalance(dayPunches)
   remainingOfTodayAsMinutes = 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
   hourBank = getDuration(overallInfo.horasMensaisPositivas) - getDuration(overallInfo.horasMensaisNegativas)
 
-  scrapedContent.statistics = {
+  content.statistics = {
     serverTime: moment().format('HH:mm:ss'),
     dayBalance: {
       completed: {
@@ -168,7 +168,7 @@ function compute (scrapedContent) {
     }
   }
 
-  return scrapedContent
+  return content
 }
 
 module.exports = { compute, getWorkTime, getStringTime }

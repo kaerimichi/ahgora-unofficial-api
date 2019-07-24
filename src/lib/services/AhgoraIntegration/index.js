@@ -2,7 +2,8 @@ const moment = require('moment')
 const atob = require('atob')
 const request = require('request-promise-native')
 const { post } = require('axios')
-const { scrape } = require('./helpers/PageScraper')
+const { transform } = require('./helpers/PayloadProcessor')
+// const { scrape } = require('./helpers/PageScraper')
 const { compute, getStringTime } = require('./helpers/TimeComputation')
 const DEFAULT_SERVICE_HOST = 'www.ahgora.com.br'
 const DUPLICATE_TOLERANCE = 5
@@ -17,27 +18,39 @@ module.exports = class AhgoraIntegration {
     this.companyId = companyId
   }
 
-  getHistory (period = moment().format('MM-YYYY')) {
+  async getHistory (knownCookie = null, period = moment().format('MM-YYYY')) {
     try {
       const [ username, password ] = atob(this.basicAuthHash.split(' ')[1]).split(':')
       const baseUrl = this.url
-      const punchesUrl = `${baseUrl}/externo/batidas/${period}`
+      const [ month, year ] = period.split('-')
+      const punchesUrl = `${baseUrl}/api-espelho/apuracao/${year}-${month}`
       const loginUrl = `${baseUrl}/externo/login`
       const form = { empresa: this.companyId, matricula: username, senha: password }
+      let authCookie = knownCookie
+      let cookieJar
+      let cookie
 
-      return request({ url: loginUrl, method: 'POST', form, resolveWithFullResponse: true, timeout: LOGIN_TIMEOUT }).then(loginResponse => {
-        const authCookie = loginResponse.headers['set-cookie'][0]
-        const cookie = request.cookie(authCookie)
-        const cookieJar = request.jar()
+      if (!authCookie) {
+        const loginResponse = await request({
+          form,
+          url: loginUrl,
+          method: 'POST',
+          resolveWithFullResponse: true,
+          timeout: LOGIN_TIMEOUT
+        })
 
-        cookieJar.setCookie(cookie, baseUrl)
+        authCookie = loginResponse.headers['set-cookie'][0]
+      }
 
-        return request({
-          url: punchesUrl,
-          jar: cookieJar,
-          timeout: HISTORY_TIMEOUT
-        }).then(scrape).then(compute)
-      })
+      cookie = request.cookie(authCookie)
+      cookieJar = request.jar()
+
+      cookieJar.setCookie(cookie, baseUrl)
+
+      return request({ url: punchesUrl, jar: cookieJar, timeout: HISTORY_TIMEOUT })
+        .then(transform)
+        .then(compute)
+        .then(response => { response.knownCookie = authCookie; return response })
     } catch (e) {
       throw e
     }
