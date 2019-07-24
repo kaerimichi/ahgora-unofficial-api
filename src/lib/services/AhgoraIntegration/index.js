@@ -2,7 +2,8 @@ const moment = require('moment')
 const atob = require('atob')
 const request = require('request-promise-native')
 const { post } = require('axios')
-const { scrape } = require('./helpers/PageScraper')
+const { transform } = require('./helpers/PayloadProcessor')
+// const { scrape } = require('./helpers/PageScraper')
 const { compute, getStringTime } = require('./helpers/TimeComputation')
 const DEFAULT_SERVICE_HOST = 'www.ahgora.com.br'
 const DUPLICATE_TOLERANCE = 5
@@ -17,11 +18,11 @@ module.exports = class AhgoraIntegration {
     this.companyId = companyId
   }
 
-  getHistory (period = moment().format('MM-YYYY')) {
+  getHistory (period = moment().format('YYYY-MM')) {
     try {
       const [ username, password ] = atob(this.basicAuthHash.split(' ')[1]).split(':')
       const baseUrl = this.url
-      const punchesUrl = `${baseUrl}/externo/batidas/${period}`
+      const punchesUrl = `${baseUrl}/api-espelho/apuracao/${period}`
       const loginUrl = `${baseUrl}/externo/login`
       const form = { empresa: this.companyId, matricula: username, senha: password }
 
@@ -36,7 +37,7 @@ module.exports = class AhgoraIntegration {
           url: punchesUrl,
           jar: cookieJar,
           timeout: HISTORY_TIMEOUT
-        }).then(scrape).then(compute)
+        }).then(transform).then(compute)
       })
     } catch (e) {
       throw e
