@@ -18,11 +18,12 @@ module.exports = class AhgoraIntegration {
     this.companyId = companyId
   }
 
-  getHistory (period = moment().format('YYYY-MM')) {
+  getHistory (period = moment().format('MM-YYYY')) {
     try {
       const [ username, password ] = atob(this.basicAuthHash.split(' ')[1]).split(':')
       const baseUrl = this.url
-      const punchesUrl = `${baseUrl}/api-espelho/apuracao/${period}`
+      const [ month, year ] = period.split('-')
+      const punchesUrl = `${baseUrl}/api-espelho/apuracao/${year}-${month}`
       const loginUrl = `${baseUrl}/externo/login`
       const form = { empresa: this.companyId, matricula: username, senha: password }
 

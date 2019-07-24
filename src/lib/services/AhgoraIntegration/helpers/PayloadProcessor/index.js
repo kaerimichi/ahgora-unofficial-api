@@ -38,11 +38,12 @@ function transform (payload) {
       Object.keys(meses).map(ref => meses[ref]).find(({ totais }) => totais.length)
     ),
     monthPunches: Object.keys(dias).map(date => {
-      const dayNumber = parseInt(moment(date, 'YYYY-MM-DD').format('e'))
+      const momentDate = moment(date, 'YYYY-MM-DD')
+      const dayNumber = parseInt(momentDate.format('e'))
       let punches = dias[date].batidas.map(({ hora }) => hora)
 
-      punches = punches.length
-        ? punches.filter(e => e.length) // TODO: remove entries from future days
+      punches = punches.length && moment().isSameOrAfter(momentDate)
+        ? punches.filter(e => e.length)
         : null
 
       return {
@@ -53,8 +54,10 @@ function transform (payload) {
         timeWorked: punches
           ? getStringTime(getWorkTime(punches))
           : null,
-        holiday: false,
-        obs: false
+        holiday: dias[date].afastamentos > 0,
+        obs: dias[date].afastamentos > 0 && dias[date].totais.length > 0
+          ? dias[date].totais.map(e => e.descricao).join(' / ')
+          : null
       }
     })
   })
