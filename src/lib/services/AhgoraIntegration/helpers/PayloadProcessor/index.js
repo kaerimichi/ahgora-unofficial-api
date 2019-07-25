@@ -40,9 +40,14 @@ function transform (payload) {
     monthPunches: Object.keys(dias).map(date => {
       const momentDate = moment(date, 'YYYY-MM-DD')
       const dayNumber = parseInt(momentDate.format('e'))
-      let punches = dias[date].batidas.map(({ hora }) => hora)
-
-      punches = punches.length && moment().isSameOrAfter(momentDate)
+      const dayHasAnyPunch = dias[date].batidas.reduce((prev, entry) => {
+        if (entry.tipo && entry.tipo === 'ONLINE') prev++
+        return prev
+      }, 0) > 0
+      let punches
+      
+      punches = dias[date].batidas.map(({ hora }) => hora)
+      punches = punches.length && moment().isSameOrAfter(momentDate) && dayHasAnyPunch
         ? punches.filter(e => e.length)
         : null
 
