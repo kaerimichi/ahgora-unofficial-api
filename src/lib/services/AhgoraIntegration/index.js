@@ -3,7 +3,6 @@ const atob = require('atob')
 const request = require('request-promise-native')
 const { post } = require('axios')
 const { transform } = require('./helpers/PayloadProcessor')
-// const { scrape } = require('./helpers/PageScraper')
 const { compute, getStringTime } = require('./helpers/TimeComputation')
 const DEFAULT_SERVICE_HOST = 'www.ahgora.com.br'
 const DUPLICATE_TOLERANCE = 5
