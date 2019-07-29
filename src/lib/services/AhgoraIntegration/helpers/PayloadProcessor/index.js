@@ -44,6 +44,7 @@ function transform (payload) {
         if (entry.tipo && entry.tipo === 'ONLINE') prev++
         return prev
       }, 0) > 0
+      const timeWorked = dias[date].totais.find(e => e.descricao === 'Horas Trabalhadas')
       let punches
       
       punches = dias[date].batidas.map(({ hora }) => hora)
@@ -56,9 +57,7 @@ function transform (payload) {
         punches,
         weekDay: dayNumber,
         weekDayAsText: getWeekDay(dayNumber),
-        timeWorked: punches
-          ? getStringTime(getWorkTime(punches))
-          : null,
+        timeWorked: timeWorked ? timeWorked.valor : null,
         holiday: dias[date].afastamentos > 0,
         obs: dias[date].afastamentos > 0 && dias[date].totais.length > 0
           ? dias[date].totais.map(e => e.descricao).join(' / ')
