@@ -77,6 +77,8 @@ module.exports = class AhgoraIntegration {
     headers['Host'] = DEFAULT_SERVICE_HOST
 
     return this.ahgoraClient.post(
+      'batidaonline/verifyIdentification',
+      body,
       { timeout: REGISTRATION_TIMEOUT, headers }
     ).then(response => response.data)
   }
