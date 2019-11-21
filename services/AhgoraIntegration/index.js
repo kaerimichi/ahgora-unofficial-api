@@ -1,48 +1,42 @@
 const moment = require('moment-timezone')
 const atob = require('atob')
-const request = require('request-promise-native')
-const { post } = require('axios')
+const axios = require('axios')
 const { transform } = require('./helpers/PayloadProcessor')
 const { compute, getStringTime } = require('./helpers/TimeComputation')
 const timezone = process.env.TZ || 'America/Sao_Paulo'
 const DEFAULT_SERVICE_HOST = 'www.ahgora.com.br'
 const DUPLICATE_TOLERANCE = 5
-const LOGIN_TIMEOUT = 4000
-const HISTORY_TIMEOUT = 6000
 const REGISTRATION_TIMEOUT = 6000
 
 moment.tz.setDefault(timezone)
 
 module.exports = class AhgoraIntegration {
   constructor (url, basicAuthHash, companyId) {
-    this.url = url || `https://${DEFAULT_SERVICE_HOST}`
     this.basicAuthHash = basicAuthHash
     this.companyId = companyId
+    this.ahgoraClient = axios.create({
+      baseURL: url || `https://${DEFAULT_SERVICE_HOST}`,
+      timeout: 8000
+    })
   }
 
   async getHistory (knownToken = null, period = moment().format('MM-YYYY')) {
     try {
       const [ username, password ] = atob(this.basicAuthHash.split(' ')[1]).split(':')
-      const baseUrl = this.url
       const [ month, year ] = period.split('-')
-      const punchesUrl = `${baseUrl}/api-espelho/apuracao/${year}-${month}`
-      const loginUrl = `${baseUrl}/externo/login`
-      const form = { empresa: this.companyId, matricula: username, senha: password }
+      const punchesEndpoint = `api-espelho/apuracao/${year}-${month}`
+      const loginEndpoint = 'externo/login'
       let token = knownToken
 
       if (!token) {
-        const loginResponse = await request({
-          form,
-          url: loginUrl,
-          method: 'POST',
-          resolveWithFullResponse: true,
-          timeout: LOGIN_TIMEOUT
-        })
+        const form = { empresa: this.companyId, matricula: username, senha: password }
+        const { data } = await this.ahgoraClient.post(loginEndpoint, form)
 
-        token = JSON.parse(loginResponse.body).jwt
+        token = data.jwt
       }
 
-      return request({ url: punchesUrl, headers: { authorization: `Bearer ${token}` }, timeout: HISTORY_TIMEOUT })
+      return this.ahgoraClient.get(punchesEndpoint, { headers: { 'Authorization': `Bearer ${token}` } })
+        .then(({ data }) => data)
         .then(transform)
         .then(compute)
         .then(response => { response.token = token; return response })
@@ -82,9 +76,7 @@ module.exports = class AhgoraIntegration {
   register (headers, body) {
     headers['Host'] = DEFAULT_SERVICE_HOST
 
-    return post(
-      `${this.url}/batidaonline/verifyIdentification`,
-      body,
+    return this.ahgoraClient.post(
       { timeout: REGISTRATION_TIMEOUT, headers }
     ).then(response => response.data)
   }

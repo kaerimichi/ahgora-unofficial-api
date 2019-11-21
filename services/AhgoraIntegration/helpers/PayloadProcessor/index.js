@@ -1,7 +1,6 @@
 const moment = require('moment')
 const slugify = require('slugify')
 const { camelCase } = require('lodash')
-const { getWorkTime, getStringTime } = require('../TimeComputation')
 
 function getWeekDay (weekDayNumber) {
   const names = {
@@ -26,7 +25,7 @@ function getOverallInfo (reference) {
 }
 
 function transform (payload) {
-  const { funcionario, dias, meses } = JSON.parse(payload)
+  const { funcionario, dias, meses } = payload
 
   return Promise.resolve({
     userInfo: {
