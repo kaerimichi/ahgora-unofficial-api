@@ -153,7 +153,9 @@ router.post('/registerdirect/:identity', async ctx => {
       throw new Error(`Erro no registro: ${registrationData.reason}`)
     }
 
-    const { statistics, monthPunches } = await ahgoraIntegration.getHistory()
+    const { statistics, monthPunches } = await ahgoraIntegration.getHistory(
+      historyContent.knownCookie
+    )
 
     ctx.body = {
       punches: monthPunches.find(({ date }) => date === currentDate).punches || [],
