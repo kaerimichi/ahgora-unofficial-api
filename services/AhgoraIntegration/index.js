@@ -1,14 +1,17 @@
-const moment = require('moment')
+const moment = require('moment-timezone')
 const atob = require('atob')
 const request = require('request-promise-native')
 const { post } = require('axios')
 const { transform } = require('./helpers/PayloadProcessor')
 const { compute, getStringTime } = require('./helpers/TimeComputation')
+const timezone = process.env.TZ || 'America/Sao_Paulo'
 const DEFAULT_SERVICE_HOST = 'www.ahgora.com.br'
 const DUPLICATE_TOLERANCE = 5
 const LOGIN_TIMEOUT = 4000
 const HISTORY_TIMEOUT = 6000
 const REGISTRATION_TIMEOUT = 6000
+
+moment.tz.setDefault(timezone)
 
 module.exports = class AhgoraIntegration {
   constructor (url, basicAuthHash, companyId) {
@@ -17,7 +20,7 @@ module.exports = class AhgoraIntegration {
     this.companyId = companyId
   }
 
-  async getHistory (knownCookie = null, period = moment().format('MM-YYYY')) {
+  async getHistory (knownToken = null, period = moment().format('MM-YYYY')) {
     try {
       const [ username, password ] = atob(this.basicAuthHash.split(' ')[1]).split(':')
       const baseUrl = this.url
@@ -25,11 +28,9 @@ module.exports = class AhgoraIntegration {
       const punchesUrl = `${baseUrl}/api-espelho/apuracao/${year}-${month}`
       const loginUrl = `${baseUrl}/externo/login`
       const form = { empresa: this.companyId, matricula: username, senha: password }
-      let authCookie = knownCookie
-      let cookieJar
-      let cookie
+      let token = knownToken
 
-      if (!authCookie) {
+      if (!token) {
         const loginResponse = await request({
           form,
           url: loginUrl,
@@ -38,18 +39,13 @@ module.exports = class AhgoraIntegration {
           timeout: LOGIN_TIMEOUT
         })
 
-        authCookie = loginResponse.headers['set-cookie'][0]
+        token = JSON.parse(loginResponse.body).jwt
       }
 
-      cookie = request.cookie(authCookie)
-      cookieJar = request.jar()
-
-      cookieJar.setCookie(cookie, baseUrl)
-
-      return request({ url: punchesUrl, jar: cookieJar, timeout: HISTORY_TIMEOUT })
+      return request({ url: punchesUrl, headers: { authorization: `Bearer ${token}` }, timeout: HISTORY_TIMEOUT })
         .then(transform)
         .then(compute)
-        .then(response => { response.knownCookie = authCookie; return response })
+        .then(response => { response.token = token; return response })
     } catch (e) {
       throw e
     }
