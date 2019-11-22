@@ -39,7 +39,7 @@ exports.handler = async event => {
 
     const registrationData = await ahgoraIntegration.register(
       event.headers,
-      JSON.parse(event.body)
+      event.body
     )
 
     if (!registrationData.result) {
