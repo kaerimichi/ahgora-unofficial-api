@@ -1,6 +1,7 @@
 const LAYERS_ROOT = process.env.LAYERS_ROOT || '/opt/'
 const AhgoraIntegration = require(`${LAYERS_ROOT}services/AhgoraIntegration`)
 const moment = require(`${LAYERS_ROOT}node_modules/moment-timezone`)
+const UPDATE_WITH_HISTORY = Boolean(parseInt(process.env.UPDATE_WITH_HISTORY))
 
 moment.tz.setDefault('America/Sao_Paulo')
 
@@ -22,14 +23,15 @@ exports.handler = async event => {
       event.headers['Authorization'],
       event.pathParameters.identity
     )
-    const historyContent = await ahgoraIntegration.getHistory()
+    let historyContent = await ahgoraIntegration.getHistory()
+    let statistics, monthPunches, registrationData, currentPunch, dayPunches
 
     if (!historyContent.userInfo.registry) {
       throw new Error('Não foi possível validar a batida.')
     }
 
-    const currentPunch = moment().format('HH:mm')
-    let dayPunches = historyContent.monthPunches
+    currentPunch = moment().format('HH:mm')
+    dayPunches = historyContent.monthPunches
       .find(e => e.date === currentDate).punches
 
     if (!dayPunches) dayPunches = []
@@ -37,7 +39,7 @@ exports.handler = async event => {
       throw new Error('Batida duplicada na tolerância.')
     }
 
-    const registrationData = await ahgoraIntegration.register(
+    registrationData = await ahgoraIntegration.register(
       event.headers,
       event.body
     )
@@ -46,9 +48,21 @@ exports.handler = async event => {
       throw new Error(`Erro no registro: ${registrationData.reason}`)
     }
 
-    const { statistics, monthPunches } = await ahgoraIntegration.getHistory(
-      historyContent.knownToken
-    )
+    if (UPDATE_WITH_HISTORY) {
+      historyContent = await ahgoraIntegration.getHistory(
+        historyContent.knownToken
+      )
+    } else {
+      dayPunches.push(moment(registrationData.time, 'HHmm').format('HH:mm'))
+        
+      historyContent = await ahgoraIntegration.recalculate(
+        historyContent,
+        [{ date: currentDate, punches: dayPunches }]
+      )
+    }
+
+    statistics = historyContent.statistics
+    monthPunches = historyContent.monthPunches
 
     return {
       isBase64Encoded: false,
