@@ -20,7 +20,7 @@ module.exports = class AhgoraIntegration {
     })
   }
 
-  async getHistory (knownToken = null, period = moment().format('MM-YYYY')) {
+  async getHistory (knownToken = null, period = moment().format('MM-YYYY'), live = true) {
     try {
       const [ username, password ] = atob(this.basicAuthHash.split(' ')[1]).split(':')
       const [ month, year ] = period.split('-')
@@ -36,7 +36,11 @@ module.exports = class AhgoraIntegration {
       }
 
       return this.ahgoraClient.get(punchesEndpoint, { headers: { 'Authorization': `Bearer ${token}` } })
-        .then(({ data }) => data)
+        .then(({ data }) => {
+          data.COMPUTE_LIVE_RESULTS = live
+
+          return data
+        })
         .then(transform)
         .then(compute)
         .then(response => { response.token = token; return response })

@@ -12,7 +12,10 @@ exports.handler = async event => {
   )
   const result = await ahgoraIntegration.getHistory(
     null,
-    event.pathParameters.period
+    event.pathParameters.period,
+    event.queryStringParameters
+      ? Boolean(parseInt(event.queryStringParameters.live))
+      : true
   )
 
   return {

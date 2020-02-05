@@ -1,5 +1,4 @@
 const moment = require('moment-timezone')
-const { last } = require('lodash')
 
 require('moment-duration-format')
 
@@ -44,7 +43,7 @@ function getWeekTotalMinutes (weekPunches) {
   return moment.duration({ hours: weekHours }).asMinutes()
 }
 
-function getWorkTime (punches = []) {
+function getWorkTime (punches = [], live = true) {
   const momentPunches = punches.map(punch => {
     const [ hour, minute ] = punch.split(':')
     const timeObject = {
@@ -79,8 +78,10 @@ function getStringTime (minutes = 0, allowNegative = false) {
   return moment.duration({ minutes }).format('HH:mm', { trim: false })
 }
 
-function getWeekMinutes (weekPunches = []) {
-  const weekMinutes = weekPunches.map(getWorkTime).reduce((a, b) => a + b, 0)
+function getWeekMinutes (weekPunches = [], live = true) {
+  const weekMinutes = weekPunches
+    .map(entry => getWorkTime(entry, live))
+    .reduce((a, b) => a + b, 0)
 
   return weekMinutes < 0 ? 0 : weekMinutes
 }
@@ -90,7 +91,7 @@ function getDayBalance (dayPunches = []) {
 }
 
 function compute (content) {
-  const { overallInfo } = content
+  const { overallInfo, liveBalance } = content
   const hourBankExists = overallInfo.horasMensaisPositivas || overallInfo.horasMensaisNegativas
   const getDuration = stringTime => {
     return Math.abs(
@@ -110,7 +111,7 @@ function compute (content) {
     .map(({ punches }) => punches)[0]
   weekPunches = getWeekPunches(content.monthPunches).map(({ punches }) => punches)
   totalWeekMinutes = getWeekTotalMinutes(getWeekPunches(content.monthPunches, true))
-  weekMinutes = getWeekMinutes(weekPunches)
+  weekMinutes = getWeekMinutes(weekPunches, liveBalance)
   dayMinutes = getDayBalance(dayPunches)
   remainingOfTodayAsMinutes = 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
   hourBank = getDuration(overallInfo.horasMensaisPositivas) - getDuration(overallInfo.horasMensaisNegativas)

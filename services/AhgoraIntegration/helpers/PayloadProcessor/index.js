@@ -33,6 +33,7 @@ function transform (payload) {
       name: funcionario.nome,
       position: funcionario.cargo
     },
+    liveBalance: payload.COMPUTE_LIVE_RESULTS,
     overallInfo: getOverallInfo(
       Object.keys(meses).map(ref => meses[ref]).find(({ totais }) => totais.length)
     ),
