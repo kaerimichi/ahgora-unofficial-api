@@ -15,7 +15,7 @@ exports.handler = async event => {
     event.pathParameters.period,
     event.queryStringParameters
       ? Boolean(parseInt(event.queryStringParameters.live))
-      : true
+      : false
   )
 
   return {

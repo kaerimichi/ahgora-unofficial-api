@@ -59,7 +59,7 @@ function getWorkTime (punches = [], live = true) {
     if (index % 2 !== 0) {
       acc += momentPunches[index] - momentPunches[index - 1]
     } else {
-      if (index === momentPunches.length - 1) {
+      if (index === momentPunches.length - 1 && live) {
         acc += currentMinutes - momentPunches[index]
       }
     }
@@ -86,8 +86,8 @@ function getWeekMinutes (weekPunches = [], live = true) {
   return weekMinutes < 0 ? 0 : weekMinutes
 }
 
-function getDayBalance (dayPunches = []) {
-  return getWeekMinutes([dayPunches])
+function getDayBalance (dayPunches = [], live = true) {
+  return getWeekMinutes([dayPunches], live)
 }
 
 function compute (content) {
@@ -112,7 +112,7 @@ function compute (content) {
   weekPunches = getWeekPunches(content.monthPunches).map(({ punches }) => punches)
   totalWeekMinutes = getWeekTotalMinutes(getWeekPunches(content.monthPunches, true))
   weekMinutes = getWeekMinutes(weekPunches, liveBalance)
-  dayMinutes = getDayBalance(dayPunches)
+  dayMinutes = getDayBalance(dayPunches, liveBalance)
   remainingOfTodayAsMinutes = 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
   hourBank = getDuration(overallInfo.horasMensaisPositivas) - getDuration(overallInfo.horasMensaisNegativas)
 
