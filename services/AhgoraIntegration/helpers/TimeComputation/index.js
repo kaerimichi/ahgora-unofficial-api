@@ -92,7 +92,7 @@ function getDayBalance (dayPunches = [], live = true) {
 
 function compute (content) {
   const { overallInfo, liveBalance } = content
-  const hourBankExists = overallInfo.horasMensaisPositivas || overallInfo.horasMensaisNegativas
+  const hourBankExists = Boolean(overallInfo.saldo)
   const getDuration = stringTime => {
     return Math.abs(
       moment.duration(stringTime).asMinutes()
@@ -114,7 +114,7 @@ function compute (content) {
   weekMinutes = getWeekMinutes(weekPunches, liveBalance)
   dayMinutes = getDayBalance(dayPunches, liveBalance)
   remainingOfTodayAsMinutes = 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
-  hourBank = getDuration(overallInfo.horasMensaisPositivas) - getDuration(overallInfo.horasMensaisNegativas)
+  hourBank = getDuration(overallInfo.saldo)
 
   content.statistics = {
     serverTime: moment().format('HH:mm:ss'),
