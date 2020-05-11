@@ -159,7 +159,7 @@ function compute (content) {
         ? {
           asMinutes: hourBank,
           asShortTime: getStringTime(hourBank, true).replace('-', ''),
-          isPositive: hourBank > 0
+          isPositive: !getStringTime(hourBank, true).includes('-')
         }
         : {
           asMinutes: 0,
