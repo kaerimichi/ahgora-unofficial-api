@@ -104,7 +104,6 @@ function compute (content) {
   let dayPunches
   let dayMinutes
   let remainingOfTodayAsMinutes
-  let hourBank
 
   dayPunches = getWeekPunches(content.monthPunches)
     .filter(({ date }) => date === moment().format('YYYY-MM-DD'))
@@ -114,7 +113,6 @@ function compute (content) {
   weekMinutes = getWeekMinutes(weekPunches, liveBalance)
   dayMinutes = getDayBalance(dayPunches, liveBalance)
   remainingOfTodayAsMinutes = 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
-  hourBank = getDuration(overallInfo.saldo)
 
   content.statistics = {
     serverTime: moment().format('HH:mm:ss'),
@@ -157,8 +155,8 @@ function compute (content) {
       },
       extra: hourBankExists
         ? {
-          asMinutes: hourBank,
-          asShortTime: getStringTime(hourBank, true).replace('-', ''),
+          asMinutes: getDuration(overallInfo.saldo),
+          asShortTime: overallInfo.saldo.replace('-', ''),
           isPositive: !overallInfo.saldo.includes('-')
         }
         : {
