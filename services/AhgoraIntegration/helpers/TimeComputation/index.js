@@ -1,4 +1,5 @@
 const moment = require('moment-timezone')
+const { CALCULATE_MONTH_BALANCE = true } = process.env
 
 require('moment-duration-format')
 
@@ -92,7 +93,7 @@ function getDayBalance (dayPunches = [], live = true) {
 
 function compute (content) {
   const { overallInfo, liveBalance } = content
-  const hourBankExists = Boolean(overallInfo.saldo)
+  const hourBankExists = Boolean(overallInfo.saldo) || (overallInfo.horasMensaisNegativas || overallInfo.horasMensaisPositivas)
   const getDuration = stringTime => {
     return Math.abs(
       moment.duration(stringTime).asMinutes()
@@ -104,6 +105,7 @@ function compute (content) {
   let dayPunches
   let dayMinutes
   let remainingOfTodayAsMinutes
+  let hourBank
 
   dayPunches = getWeekPunches(content.monthPunches)
     .filter(({ date }) => date === moment().format('YYYY-MM-DD'))
@@ -113,6 +115,9 @@ function compute (content) {
   weekMinutes = getWeekMinutes(weekPunches, liveBalance)
   dayMinutes = getDayBalance(dayPunches, liveBalance)
   remainingOfTodayAsMinutes = 480 - dayMinutes < 0 ? 0 : 480 - dayMinutes
+  hourBank = CALCULATE_MONTH_BALANCE
+    ? getDuration(overallInfo.horasMensaisPositivas) - getDuration(overallInfo.horasMensaisNegativas)
+    : getDuration(overallInfo.saldo)
 
   content.statistics = {
     serverTime: moment().format('HH:mm:ss'),
@@ -155,9 +160,9 @@ function compute (content) {
       },
       extra: hourBankExists
         ? {
-          asMinutes: getDuration(overallInfo.saldo),
-          asShortTime: overallInfo.saldo.replace('-', ''),
-          isPositive: !overallInfo.saldo.includes('-')
+          asMinutes: hourBank,
+          asShortTime: getStringTime(hourBank).replace('-', ''),
+          isPositive: !getStringTime(hourBank).includes('-')
         }
         : {
           asMinutes: 0,
