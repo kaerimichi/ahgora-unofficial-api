@@ -93,7 +93,7 @@ function getDayBalance (dayPunches = [], live = true) {
 
 function compute (content) {
   const { overallInfo, liveBalance } = content
-  const hourBankExists = Boolean(overallInfo.saldo) || (overallInfo.horasMensaisNegativas || overallInfo.horasMensaisPositivas)
+  const hourBankExists = Boolean(overallInfo.saldo) || Boolean(overallInfo.horasMensaisNegativas || overallInfo.horasMensaisPositivas)
   const getDuration = stringTime => {
     return Math.abs(
       moment.duration(stringTime).asMinutes()
@@ -161,8 +161,8 @@ function compute (content) {
       extra: hourBankExists
         ? {
           asMinutes: hourBank,
-          asShortTime: getStringTime(hourBank).replace('-', ''),
-          isPositive: !getStringTime(hourBank).includes('-')
+          asShortTime: getStringTime(hourBank, true).replace('-', ''),
+          isPositive: !getStringTime(hourBank, true).includes('-')
         }
         : {
           asMinutes: 0,
