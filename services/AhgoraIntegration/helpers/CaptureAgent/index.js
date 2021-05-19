@@ -1,10 +1,10 @@
 const https = require('https')
 const {
-  CAP_ENABLED = true,
+  CAP_ENABLED = '0',
   CAP_HOST = '',
-  CAP_PORT = 443,
+  CAP_PORT = '443',
   CAP_ENDPOINT = '/',
-  CAP_TIMEOUT = 1000
+  CAP_TIMEOUT = '1000'
 } = process.env
 
 function capture (subject) {
@@ -12,10 +12,10 @@ function capture (subject) {
     const data = JSON.stringify(subject)
     const options = {
       hostname: CAP_HOST,
-      port: CAP_PORT,
+      port: parseInt(CAP_PORT),
       path: CAP_ENDPOINT,
       method: 'POST',
-      timeout: CAP_TIMEOUT,
+      timeout: parseInt(CAP_TIMEOUT),
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': data.length
@@ -25,7 +25,9 @@ function capture (subject) {
     return new Promise(resolve => {
       let req
 
-      if (!CAP_ENABLED) return resolve(subject)
+      if (!Boolean(parseInt(CAP_ENABLED))) {
+        return resolve(subject)
+      }
 
       req = https.request(options, res => {
         res.on('data', () => {
