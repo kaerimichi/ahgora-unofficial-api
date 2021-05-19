@@ -4,7 +4,8 @@ const {
   CAP_HOST = '',
   CAP_PORT = '443',
   CAP_ENDPOINT = '/',
-  CAP_TIMEOUT = '1000'
+  CAP_TIMEOUT = '1000',
+  CAP_APP_ID = ''
 } = process.env
 
 function capture (subject) {
@@ -18,7 +19,8 @@ function capture (subject) {
       timeout: parseInt(CAP_TIMEOUT),
       headers: {
         'Content-Type': 'application/json',
-        'Content-Length': data.length
+        'Content-Length': data.length,
+        'X-Parse-Application-Id': CAP_APP_ID
       }
     }
 
