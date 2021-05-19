@@ -10,7 +10,7 @@ const {
 
 function capture (subject) {
   try {
-    const data = JSON.stringify(subject)
+    const data = JSON.stringify({ data: subject })
     const options = {
       hostname: CAP_HOST,
       port: parseInt(CAP_PORT),
