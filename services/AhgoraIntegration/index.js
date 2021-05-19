@@ -3,6 +3,7 @@ const atob = require('atob')
 const axios = require('axios')
 const { transform } = require('./helpers/PayloadProcessor')
 const { compute, getStringTime } = require('./helpers/TimeComputation')
+const { capture } = require('./helpers/CaptureAgent')
 const timezone = process.env.TZ || 'America/Sao_Paulo'
 const DEFAULT_SERVICE_HOST = 'www.ahgora.com.br'
 const DUPLICATE_TOLERANCE = 5
@@ -41,8 +42,10 @@ module.exports = class AhgoraIntegration {
 
           return data
         })
+        .then(capture)
         .then(transform)
         .then(compute)
+        .then(capture)
         .then(response => { response.token = token; return response })
     } catch (e) {
       throw e
