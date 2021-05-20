@@ -1,6 +1,6 @@
 const moment = require('moment-timezone')
 const { CALCULATE_MONTH_BALANCE = '1', WORKSHIFT = '8' } = process.env
-const { compute } = require('zaman-statistics-generator')
+const { compute: computeWithZsg } = require('zaman-statistics-generator')
 
 require('moment-duration-format')
 
@@ -52,7 +52,7 @@ function compute (content) {
 
   return {
     monthPunches,
-    statistics: compute(monthPunches, parseInt(WORKSHIFT), hourBank)
+    statistics: computeWithZsg(monthPunches, parseInt(WORKSHIFT), hourBank)
   }
 }
 
