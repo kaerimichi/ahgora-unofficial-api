@@ -25,6 +25,6 @@
     "moment-duration-format": "^2.2.2",
     "moment-timezone": "^0.5.23",
     "slugify": "^1.3.1",
-    "zaman-statistics-generator": "^1.4.12"
+    "zaman-statistics-generator": "^1.4.13"
   }
 }

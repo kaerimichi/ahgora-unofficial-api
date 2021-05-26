@@ -1412,9 +1412,9 @@ xtend@^4.0.0, xtend@^4.0.1:
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
   integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
 
-zaman-statistics-generator@^1.4.12:
-  version "1.4.12"
-  resolved "https://registry.yarnpkg.com/zaman-statistics-generator/-/zaman-statistics-generator-1.4.12.tgz#a2d5d5d582e4e0604940f21d4110a4bc04508412"
-  integrity sha512-g1Fd4dxXQucn4ye7vdyoPT9gDr4SJOoDE9PrRWcqRHBBpGeqXhc7q4LvMf5ilpS1MukCNn3jB02dkjCKzj7Cig==
+zaman-statistics-generator@^1.4.13:
+  version "1.4.13"
+  resolved "https://registry.yarnpkg.com/zaman-statistics-generator/-/zaman-statistics-generator-1.4.13.tgz#fa5a5f20a086188060be1885ad53277b81203f54"
+  integrity sha512-c94+t678f+SrmTHmoYbZvy+Ge6FJOdBMxhTdiVnFzNUJsPjIUR0jtRAl03Nj/6c5L0/WYUgzue8arEUn45wANQ==
   dependencies:
     date-fns "^2.21.1"

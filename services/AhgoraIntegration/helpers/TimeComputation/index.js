@@ -40,7 +40,12 @@ function getStringTime (minutes = 0, allowNegative = false) {
 }
 
 function compute (content) {
-  const { overallInfo, monthPunches } = content
+  const {
+    userInfo,
+    overallInfo,
+    liveBalance,
+    monthPunches
+  } = content
   const getDuration = stringTime => {
     return Math.abs(
       moment.duration(stringTime).asMinutes()
@@ -51,6 +56,9 @@ function compute (content) {
     : getDuration(overallInfo.saldo)
 
   return {
+    userInfo,
+    overallInfo,
+    liveBalance,
     monthPunches,
     statistics: computeWithZsg(monthPunches, parseInt(WORKSHIFT), hourBank)
   }
