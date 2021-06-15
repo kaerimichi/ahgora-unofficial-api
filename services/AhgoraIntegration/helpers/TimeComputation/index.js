@@ -54,13 +54,15 @@ function compute (content) {
   const hourBank = Boolean(parseInt(CALCULATE_MONTH_BALANCE))
     ? getDuration(overallInfo.horasMensaisPositivas) - getDuration(overallInfo.horasMensaisNegativas)
     : getDuration(overallInfo.saldo)
+  const statistics = computeWithZsg(monthPunches, parseInt(WORKSHIFT), hourBank)
 
   return {
     userInfo,
     overallInfo,
     liveBalance,
     monthPunches,
-    statistics: computeWithZsg(monthPunches, parseInt(WORKSHIFT), hourBank)
+    statistics,
+    hourBank
   }
 }
 
