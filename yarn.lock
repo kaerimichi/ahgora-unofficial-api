@@ -199,6 +199,11 @@ d@1, d@^1.0.1:
     es5-ext "^0.10.50"
     type "^1.0.1"
 
+date-fns@^2.21.1:
+  version "2.21.3"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.21.3.tgz#8f5f6889d7a96bbcc1f0ea50239b397a83357f9b"
+  integrity sha512-HeYdzCaFflc1i4tGbj7JKMjM4cKGYoyxwcIIkHzNgCkX8xXDNJDZXgDDVchIWpN4eQc3lH37WarduXFZJOtxfw==
+
 debug-log@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/debug-log/-/debug-log-1.0.1.tgz#2307632d4c04382b8df8a32f70b895046d52745f"
@@ -1391,3 +1396,10 @@ xtend@^4.0.0, xtend@^4.0.1:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
   integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
+
+zaman-statistics-generator@^1.4.13:
+  version "1.4.13"
+  resolved "https://registry.yarnpkg.com/zaman-statistics-generator/-/zaman-statistics-generator-1.4.13.tgz#fa5a5f20a086188060be1885ad53277b81203f54"
+  integrity sha512-c94+t678f+SrmTHmoYbZvy+Ge6FJOdBMxhTdiVnFzNUJsPjIUR0jtRAl03Nj/6c5L0/WYUgzue8arEUn45wANQ==
+  dependencies:
+    date-fns "^2.21.1"
